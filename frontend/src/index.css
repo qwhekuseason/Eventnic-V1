@@ -165,3 +165,62 @@ body { font-family: 'Inter', sans-serif; }
 .bg-gradient-dark {
   background-image: radial-gradient(circle at top right, #3323cc 0%, #0f0069 40%, #05001a 100%);
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-primary);
+}
+
+.glow-primary {
+  box-shadow: 0 0 24px rgba(72, 52, 164, 0.3);
+}
+
+.glow-tertiary {
+  box-shadow: 0 0 24px rgba(169, 151, 250, 0.3);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.3);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, var(--color-surface-container-high) 4%, var(--color-surface-container-highest) 25%, var(--color-surface-container-high) 36%);
+  background-size: 1000px 100%;
+}
+
+.text-gradient-animated {
+  background: linear-gradient(to right, var(--color-primary), var(--color-tertiary), var(--color-primary));
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+

@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { app } from '../../config/firebase';
 
 export default function OrganizerCheckInScanner() {
+  const db = getFirestore(app);
   const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [lastScanned, setLastScanned] = useState<{name: string, ticketType: string} | null>(null);
+  const [lookupId, setLookupId] = useState('');
+  const [isLookingUp, setIsLookingUp] = useState(false);
 
   const simulateScan = (type: 'success' | 'error') => {
     setScanStatus(type);
@@ -16,6 +21,34 @@ export default function OrganizerCheckInScanner() {
     setTimeout(() => {
       setScanStatus('idle');
     }, 3000);
+  };
+
+  const handleManualLookup = async () => {
+    if (!lookupId) return;
+    setIsLookingUp(true);
+    try {
+      const ticketRef = doc(db, 'tickets', lookupId);
+      const ticketSnap = await getDoc(ticketRef);
+      
+      if (!ticketSnap.exists()) {
+        simulateScan('error');
+      } else {
+        const tData = ticketSnap.data();
+        if (tData.status === 'valid') {
+          await updateDoc(ticketRef, { status: 'checked_in' });
+          setLastScanned({ name: 'Valid User', ticketType: tData.tierId });
+          setScanStatus('success');
+        } else {
+          simulateScan('error'); // already checked in or cancelled
+        }
+      }
+    } catch (e) {
+      simulateScan('error');
+    } finally {
+      setIsLookingUp(false);
+      setLookupId('');
+      setTimeout(() => setScanStatus('idle'), 3000);
+    }
   };
 
   return (
@@ -110,11 +143,17 @@ export default function OrganizerCheckInScanner() {
               <div className="flex gap-sm">
                 <input 
                   type="text" 
-                  placeholder="Ticket ID or Email"
+                  value={lookupId}
+                  onChange={(e) => setLookupId(e.target.value)}
+                  placeholder="Ticket ID"
                   className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
-                <button className="bg-surface-container-highest text-on-surface font-bold px-lg rounded-xl hover:bg-outline-variant transition-colors">
-                  Lookup
+                <button 
+                  onClick={handleManualLookup}
+                  disabled={isLookingUp}
+                  className="bg-surface-container-highest text-on-surface font-bold px-lg rounded-xl hover:bg-outline-variant transition-colors"
+                >
+                  {isLookingUp ? '...' : 'Lookup'}
                 </button>
               </div>
             </div>

@@ -28,21 +28,21 @@ export default function CreateEventBasicInfoEventnic() {
   const set = (patch) => updateDraft(patch);
 
   // ---- Speakers ----
-  const addSpeaker = () => set({ speakers: [...draft.speakers, { id: uid(), name: '', title: '' }] });
+  const addSpeaker = () => set({ speakers: [...draft.speakers, { id: uid(), name: '', title: '', imageUrl: '' }] });
   const updateSpeaker = (id, field, value) =>
     set({ speakers: draft.speakers.map((s) => (s.id === id ? { ...s, [field]: value } : s)) });
   const removeSpeaker = (id) => set({ speakers: draft.speakers.filter((s) => s.id !== id) });
 
   // ---- Voting ----
   const addCategory = () =>
-    set({ votingCategories: [...draft.votingCategories, { id: uid(), name: '', nominees: [{ id: uid(), name: '', description: '', votes: 0 }] }] });
+    set({ votingCategories: [...draft.votingCategories, { id: uid(), name: '', nominees: [{ id: uid(), name: '', description: '', votes: 0, imageUrl: '' }] }] });
   const updateCategory = (id, name) =>
     set({ votingCategories: draft.votingCategories.map((c) => (c.id === id ? { ...c, name } : c)) });
   const removeCategory = (id) => set({ votingCategories: draft.votingCategories.filter((c) => c.id !== id) });
   const addNominee = (catId) =>
     set({
       votingCategories: draft.votingCategories.map((c) =>
-        c.id === catId ? { ...c, nominees: [...c.nominees, { id: uid(), name: '', description: '', votes: 0 }] } : c,
+        c.id === catId ? { ...c, nominees: [...c.nominees, { id: uid(), name: '', description: '', votes: 0, imageUrl: '' }] } : c,
       ),
     });
   const updateNominee = (catId, nomId, field, value) =>
@@ -100,15 +100,22 @@ export default function CreateEventBasicInfoEventnic() {
             </div>
 
             <div className="space-y-xs">
-              <label className="font-label-md text-label-md text-on-surface">Category</label>
-              <select value={draft.category} onChange={(e) => set({ category: e.target.value })} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md appearance-none bg-white">
-                <option value="">Select a category</option>
-                <option value="conference">Conference</option>
-                <option value="workshop">Workshop</option>
-                <option value="concert">Concert</option>
-                <option value="networking">Networking</option>
-                <option value="exhibition">Exhibition</option>
-              </select>
+              <label className="font-label-md text-label-md text-on-surface">Event Type</label>
+              <input
+                list="event-type-list"
+                value={draft.category}
+                onChange={(e) => set({ category: e.target.value })}
+                className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md bg-white"
+                placeholder="Select or type your event type"
+                type="text"
+              />
+              <datalist id="event-type-list">
+                <option value="Conference" />
+                <option value="Workshop" />
+                <option value="Concert" />
+                <option value="Networking" />
+                <option value="Exhibition" />
+              </datalist>
             </div>
 
             <div className="space-y-xs">
@@ -172,6 +179,7 @@ export default function CreateEventBasicInfoEventnic() {
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-md">
                       <input value={s.name} onChange={(e) => updateSpeaker(s.id, 'name', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Speaker Name" type="text" />
                       <input value={s.title} onChange={(e) => updateSpeaker(s.id, 'title', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Title / Role" type="text" />
+                      <input value={s.imageUrl} onChange={(e) => updateSpeaker(s.id, 'imageUrl', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Speaker Image URL" type="url" />
                     </div>
                     <button type="button" onClick={() => removeSpeaker(s.id)} className="text-secondary hover:text-error transition-colors p-sm">
                       <span className="material-symbols-outlined">delete</span>
@@ -199,6 +207,21 @@ export default function CreateEventBasicInfoEventnic() {
 
               {draft.votingEnabled && (
                 <div className="space-y-md">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                    <div className="space-y-xs">
+                      <label className="font-label-md text-label-md text-on-surface">Voting Ends</label>
+                      <input
+                        type="date"
+                        value={draft.votingEndDate || ''}
+                        onChange={(e) => set({ votingEndDate: e.target.value })}
+                        className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md"
+                      />
+                    </div>
+                    <div className="space-y-xs">
+                      <label className="font-label-md text-label-md text-on-surface">Voting Notes</label>
+                      <p className="text-secondary font-body-sm">Set a voting end date so live voting closes automatically after the selected day.</p>
+                    </div>
+                  </div>
                   {draft.votingCategories.map((cat) => (
                     <div key={cat.id} className="bg-surface-container-low p-lg rounded-xl border border-primary/20 space-y-md">
                       <div className="flex items-center justify-between">
@@ -207,12 +230,17 @@ export default function CreateEventBasicInfoEventnic() {
                       </div>
                       <div className="space-y-sm pl-md border-l-2 border-outline-variant">
                         {cat.nominees.map((nom) => (
-                          <div key={nom.id} className="flex flex-col sm:flex-row items-center gap-md">
-                            <input value={nom.name} onChange={(e) => updateNominee(cat.id, nom.id, 'name', e.target.value)} className="w-full sm:flex-1 h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Nominee Name" type="text" />
-                            <input value={nom.description} onChange={(e) => updateNominee(cat.id, nom.id, 'description', e.target.value)} className="w-full sm:flex-1 h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Short Description" type="text" />
-                            <button type="button" onClick={() => removeNominee(cat.id, nom.id)} className="text-secondary hover:text-error transition-colors p-sm self-end sm:self-auto">
-                              <span className="material-symbols-outlined">close</span>
-                            </button>
+                          <div key={nom.id} className="space-y-sm bg-surface p-md rounded-xl">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-md items-end">
+                              <input value={nom.name} onChange={(e) => updateNominee(cat.id, nom.id, 'name', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Nominee Name" type="text" />
+                              <input value={nom.description} onChange={(e) => updateNominee(cat.id, nom.id, 'description', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Short Description" type="text" />
+                              <input value={nom.imageUrl || ''} onChange={(e) => updateNominee(cat.id, nom.id, 'imageUrl', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Nominee Image URL" type="url" />
+                            </div>
+                            <div className="flex justify-end">
+                              <button type="button" onClick={() => removeNominee(cat.id, nom.id)} className="text-secondary hover:text-error transition-colors p-sm self-end sm:self-auto">
+                                <span className="material-symbols-outlined">close</span>
+                              </button>
+                            </div>
                           </div>
                         ))}
                         <button type="button" onClick={() => addNominee(cat.id)} className="flex items-center gap-xs text-primary font-bold font-label-md hover:underline pt-xs">

@@ -68,8 +68,12 @@ export default function PublicEventPageTechpulseGlobal2024() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-lg">
             {event.speakers.map((s) => (
               <div key={s.id} className="bg-white border border-outline-variant rounded-xl p-lg flex flex-col items-center text-center shadow-sm">
-                <div className="w-20 h-20 rounded-full bg-primary-fixed text-primary flex items-center justify-center mb-md">
-                  <span className="material-symbols-outlined text-[40px]">person</span>
+                <div className="w-20 h-20 rounded-full overflow-hidden bg-surface-container-high text-primary flex items-center justify-center mb-md">
+                  {s.imageUrl ? (
+                    <img className="w-full h-full object-cover" src={s.imageUrl} alt={s.name || 'Speaker'} />
+                  ) : (
+                    <span className="material-symbols-outlined text-[40px]">person</span>
+                  )}
                 </div>
                 <h3 className="font-headline-sm text-on-surface">{s.name}</h3>
                 <p className="font-body-sm text-secondary">{s.title}</p>
@@ -149,7 +153,11 @@ export default function PublicEventPageTechpulseGlobal2024() {
             <div className="text-center mb-xl">
               <span className="bg-tertiary-container text-on-tertiary-container px-md py-xs rounded-full font-label-sm uppercase tracking-widest mb-md inline-block">Live Voting</span>
               <h2 className="font-headline-lg text-headline-lg text-on-surface">Community Awards</h2>
-              <p className="font-body-md text-body-md text-secondary">Cast your vote for the innovators shaping the future. No account required.</p>
+              <p className="font-body-md text-body-md text-secondary mb-md">Cast your vote for the innovators shaping the future. No account required.</p>
+              {event.votingEndDate && <p className="font-body-sm text-secondary mb-md">Voting closes on {event.votingEndDate}.</p>}
+              <Link to={`/event/${event.slug}/nominate`} className="inline-block bg-surface border border-outline hover:border-primary text-primary font-bold px-lg py-sm rounded-full transition-colors">
+                Nominate Someone
+              </Link>
             </div>
 
             {event.votingCategories.map((cat) => {
@@ -166,8 +174,12 @@ export default function PublicEventPageTechpulseGlobal2024() {
                       const share = total > 0 ? Math.round((nom.votes / total) * 100) : 0;
                       return (
                         <div key={nom.id} className="bg-white p-lg rounded-xl border border-outline-variant flex flex-col text-center shadow-sm hover:border-primary transition-all">
-                          <div className="w-20 h-20 rounded-full bg-primary-fixed text-primary mb-md overflow-hidden flex items-center justify-center mx-auto">
-                            <span className="material-symbols-outlined text-[36px]">emoji_events</span>
+                          <div className="w-20 h-20 rounded-full mb-md overflow-hidden mx-auto bg-surface-container-high flex items-center justify-center">
+                            {nom.imageUrl ? (
+                              <img className="w-full h-full object-cover" src={nom.imageUrl} alt={nom.name || 'Nominee'} />
+                            ) : (
+                              <span className="material-symbols-outlined text-[36px]">emoji_events</span>
+                            )}
                           </div>
                           <h4 className="font-headline-sm font-bold text-on-surface">{nom.name}</h4>
                           <p className="text-secondary font-body-sm mb-md">{nom.description}</p>

@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { SEED_EVENTS } from './seedEvents';
+import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, getDoc } from 'firebase/firestore';
+import { getAuth, signInAnonymously } from 'firebase/auth';
+import { app } from '../config/firebase';
 
 export type EventStatus = 'draft' | 'pending' | 'published' | 'rejected';
 
@@ -16,6 +18,7 @@ export interface Speaker {
   id: string;
   name: string;
   title: string;
+  imageUrl?: string;
 }
 
 export interface AgendaItem {
@@ -31,6 +34,7 @@ export interface Nominee {
   name: string;
   description: string;
   votes: number;
+  imageUrl?: string;
 }
 
 export interface VotingCategory {
@@ -52,8 +56,10 @@ export interface EventRecord {
   time: string;
   organizerEmail: string;
   organizerName: string;
+  votePrice: number;
   speakers: Speaker[];
   votingEnabled: boolean;
+  votingEndDate?: string;
   votingCategories: VotingCategory[];
   ticketTiers: TicketTier[];
   agenda: AgendaItem[];
@@ -74,15 +80,15 @@ export interface DraftEvent {
   time: string;
   speakers: Speaker[];
   votingEnabled: boolean;
+  votingEndDate?: string;
   votingCategories: VotingCategory[];
   ticketTiers: TicketTier[];
   agenda: AgendaItem[];
   rsvpEnabled: boolean;
 }
 
-const EVENTS_KEY = 'eventnic_events';
-const DRAFT_KEY = 'eventnic_draft';
-const VOTES_KEY = 'eventnic_votes';
+const DRAFT_KEY = 'eventnic_draft_v2';
+const VOTES_KEY = 'eventnic_votes_v2';
 
 export const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -100,6 +106,7 @@ export const emptyDraft = (): DraftEvent => ({
   time: '',
   speakers: [],
   votingEnabled: false,
+  votingEndDate: '',
   votingCategories: [],
   ticketTiers: [],
   agenda: [],
@@ -156,29 +163,19 @@ interface EventsContextType {
   nomineeStandings: (name: string) => NomineeStanding[];
   hasVoted: (eventId: string, categoryId: string) => boolean;
   // mutations
-  createEvent: (data: DraftEvent, status: EventStatus, organizerEmail: string, organizerName: string) => EventRecord;
-  updateEvent: (id: string, patch: Partial<EventRecord>) => void;
-  deleteEvent: (id: string) => void;
-  approveEvent: (id: string) => void;
-  rejectEvent: (id: string) => void;
-  castVote: (eventId: string, categoryId: string, nomineeId: string) => boolean;
-  recordPurchase: (eventId: string, tierId: string, qty: number) => void;
+  createEvent: (data: DraftEvent, status: EventStatus, organizerEmail: string, organizerName: string, votePrice: number) => Promise<EventRecord>;
+  updateEvent: (id: string, patch: Partial<EventRecord>) => Promise<void>;
+  deleteEvent: (id: string) => Promise<void>;
+  approveEvent: (id: string) => Promise<void>;
+  rejectEvent: (id: string) => Promise<void>;
+  castVote: (eventId: string, categoryId: string, nomineeId: string) => Promise<boolean>;
+  recordPurchase: (eventId: string, tierId: string, qty: number) => Promise<void>;
   // draft
   updateDraft: (patch: Partial<DraftEvent>) => void;
   resetDraft: () => void;
 }
 
 const EventsContext = createContext<EventsContextType | undefined>(undefined);
-
-function loadEvents(): EventRecord[] {
-  try {
-    const raw = localStorage.getItem(EVENTS_KEY);
-    if (raw) return JSON.parse(raw) as EventRecord[];
-  } catch (err) {
-    console.error('Failed to parse stored events:', err);
-  }
-  return SEED_EVENTS;
-}
 
 function loadDraft(): DraftEvent {
   try {
@@ -200,14 +197,29 @@ function loadVotes(): string[] {
   return [];
 }
 
+const db = getFirestore(app);
+const auth = getAuth(app);
+
 export function EventsProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useState<EventRecord[]>(loadEvents);
+  const [events, setEvents] = useState<EventRecord[]>([]);
   const [draft, setDraft] = useState<DraftEvent>(loadDraft);
   const [votes, setVotes] = useState<string[]>(loadVotes);
 
+  // Sync events from Firestore
   useEffect(() => {
-    localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
-  }, [events]);
+    const unsubscribe = onSnapshot(collection(db, 'events'), (snapshot) => {
+      const liveEvents: EventRecord[] = [];
+      snapshot.forEach((doc) => {
+        liveEvents.push(doc.data() as EventRecord);
+      });
+      // Sort by creation date descending
+      setEvents(liveEvents.sort((a, b) => b.createdAt - a.createdAt));
+    }, (error) => {
+      console.error("Error fetching live events:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -298,83 +310,137 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   );
 
   const createEvent = useCallback(
-    (data: DraftEvent, status: EventStatus, organizerEmail: string, organizerName: string): EventRecord => {
+    async (data: DraftEvent, status: EventStatus, organizerEmail: string, organizerName: string, votePrice: number): Promise<EventRecord> => {
+      const newId = uid();
       const record: EventRecord = {
         ...data,
-        id: uid(),
-        slug: slugify(data.title || 'untitled-event') + '-' + uid().slice(0, 4),
+        id: newId,
+        slug: slugify(data.title || 'untitled-event') + '-' + newId.slice(0, 4),
         organizerEmail,
         organizerName,
+        votePrice,
         status,
         createdAt: Date.now(),
-        // New events start at zero sales.
+        votingEndDate: data.votingEndDate,
         ticketTiers: data.ticketTiers.map((t) => ({ ...t, sold: 0 })),
-        // New events start at zero votes.
         votingCategories: data.votingCategories.map((c) => ({
           ...c,
           nominees: c.nominees.map((n) => ({ ...n, votes: 0 })),
         })),
       };
-      setEvents((prev) => [record, ...prev]);
+      await setDoc(doc(db, 'events', newId), record);
       return record;
     },
     [],
   );
 
-  const updateEvent = useCallback((id: string, patch: Partial<EventRecord>) => {
-    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  const updateEvent = useCallback(async (id: string, patch: Partial<EventRecord>) => {
+    await updateDoc(doc(db, 'events', id), patch);
   }, []);
 
-  const deleteEvent = useCallback((id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+  const deleteEvent = useCallback(async (id: string) => {
+    await deleteDoc(doc(db, 'events', id));
   }, []);
 
-  const approveEvent = useCallback((id: string) => {
-    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, status: 'published' } : e)));
+  const approveEvent = useCallback(async (id: string) => {
+    await updateDoc(doc(db, 'events', id), { status: 'published' });
   }, []);
 
-  const rejectEvent = useCallback((id: string) => {
-    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, status: 'rejected' } : e)));
+  const rejectEvent = useCallback(async (id: string) => {
+    await updateDoc(doc(db, 'events', id), { status: 'rejected' });
   }, []);
 
   const castVote = useCallback(
-    (eventId: string, categoryId: string, nomineeId: string): boolean => {
+    async (eventId: string, categoryId: string, nomineeId: string): Promise<boolean> => {
+      let voterId = localStorage.getItem('anonVoterId');
+      let firebaseUser = auth.currentUser;
+
+      if (!voterId) {
+        voterId = uid();
+        localStorage.setItem('anonVoterId', voterId);
+      }
+
+      if (!firebaseUser) {
+        try {
+          const credential = await signInAnonymously(auth);
+          firebaseUser = credential.user;
+        } catch (error) {
+          console.error('Anonymous sign-in failed for voting:', error);
+        }
+      }
+
       const key = `${eventId}:${categoryId}`;
       if (votes.includes(key)) return false;
-      setEvents((prev) =>
-        prev.map((e) => {
-          if (e.id !== eventId) return e;
-          return {
-            ...e,
-            votingCategories: e.votingCategories.map((c) =>
-              c.id !== categoryId
-                ? c
-                : {
-                    ...c,
-                    nominees: c.nominees.map((n) => (n.id === nomineeId ? { ...n, votes: n.votes + 1 } : n)),
-                  },
-            ),
-          };
-        }),
+      
+      const eventRef = doc(db, 'events', eventId);
+      const snap = await getDoc(eventRef);
+      if (!snap.exists()) return false;
+      
+      const eventData = snap.data() as EventRecord;
+      if (eventData.votingEnabled && eventData.votingEndDate) {
+        const now = new Date();
+        const endDate = new Date(eventData.votingEndDate);
+        endDate.setHours(23, 59, 59, 999);
+        if (now > endDate) return false;
+      }
+
+      const updatedCategories = eventData.votingCategories.map((c) =>
+        c.id !== categoryId
+          ? c
+          : {
+              ...c,
+              nominees: c.nominees.map((n) => (n.id === nomineeId ? { ...n, votes: n.votes + 1 } : n)),
+            },
       );
+      
+      // Update event doc
+      await updateDoc(eventRef, { votingCategories: updatedCategories });
+      
+      // Write to votes collection
+      const voteId = uid();
+      await setDoc(doc(db, 'votes', voteId), {
+        id: voteId,
+        eventId,
+        categoryId,
+        nomineeId,
+        voterId,
+        createdAt: Date.now()
+      });
+
       setVotes((prev) => [...prev, key]);
       return true;
     },
     [votes],
   );
 
-  const recordPurchase = useCallback((eventId: string, tierId: string, qty: number) => {
-    setEvents((prev) =>
-      prev.map((e) => {
-        if (e.id !== eventId) return e;
-        return {
-          ...e,
-          ticketTiers: e.ticketTiers.map((t) =>
-            t.id === tierId ? { ...t, sold: Math.min(t.quantity, t.sold + qty) } : t,
-          ),
-        };
-      }),
+  const recordPurchase = useCallback(async (eventId: string, tierId: string, qty: number) => {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const eventRef = doc(db, 'events', eventId);
+    const snap = await getDoc(eventRef);
+    if (!snap.exists()) return;
+    
+    const eventData = snap.data() as EventRecord;
+    const updatedTiers = eventData.ticketTiers.map((t) =>
+      t.id === tierId ? { ...t, sold: Math.min(t.quantity, t.sold + qty) } : t,
     );
+    
+    // Update event doc
+    await updateDoc(eventRef, { ticketTiers: updatedTiers });
+    
+    // Write to tickets collection
+    for (let i = 0; i < qty; i++) {
+      const ticketId = uid();
+      await setDoc(doc(db, 'tickets', ticketId), {
+        id: ticketId,
+        eventId,
+        tierId,
+        userId: user.uid,
+        status: 'valid', // valid, checked_in, cancelled
+        createdAt: Date.now()
+      });
+    }
   }, []);
 
   const updateDraft = useCallback((patch: Partial<DraftEvent>) => {

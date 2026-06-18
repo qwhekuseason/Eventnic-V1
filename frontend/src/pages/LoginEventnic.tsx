@@ -1,33 +1,73 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
-import { useAuth, resolveRole, roleHomePath } from '../contexts/AuthContext';
+import { useAuth, roleHomePath } from '../contexts/AuthContext';
+import type { User, Role } from '../contexts/AuthContext';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { app } from '../config/firebase';
 
 export default function LoginEventnic() {
   const navigate = useNavigate();
   const { login } = useAuth();
-
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    // Role is resolved on the "server" from the credentials, not picked in the UI.
-    const role = resolveRole(email);
-    const defaultNames: Record<string, string> = {
-      ADMIN: 'System Admin',
-      ORGANIZER: 'Markus DJ',
-      NOMINEE: 'Sarah Nominee',
-    };
-    const user = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: defaultNames[role] ?? (email.split('@')[0] || 'Guest'),
-      email: email,
-      role: role,
-    };
+    try {
+      const auth = getAuth(app);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Fetch role from Firestore
+      const db = getFirestore(app);
+      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+      
+      let role: Role = 'VOTER';
+      let name = email.split('@')[0];
+      
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        role = (data.role as Role) || 'VOTER';
+        name = data.name || name;
+      }
+      
+      const userData: User = {
+        id: userCredential.user.uid,
+        name: name,
+        email: email,
+        role: role,
+        status: (userDoc.exists() ? (userDoc.data().status as 'active' | 'suspended' | 'pending') : 'active') || 'active',
+        verificationStatus: userDoc.exists() ? userDoc.data().verificationStatus : undefined,
+        companyName: userDoc.exists() ? userDoc.data().companyName : undefined,
+        registrationNumber: userDoc.exists() ? userDoc.data().registrationNumber : undefined,
+        phone: userDoc.exists() ? userDoc.data().phone : undefined,
+        ghanaCardNumber: userDoc.exists() ? userDoc.data().ghanaCardNumber : undefined,
+        verificationDocumentUrl: userDoc.exists() ? userDoc.data().verificationDocumentUrl : undefined,
+        votePrice: userDoc.exists() ? userDoc.data().votePrice : undefined,
+        balance: userDoc.exists() ? userDoc.data().balance : undefined,
+      };
 
-    login(user);
-    navigate(roleHomePath(role));
+      if (userData.status === 'suspended') {
+        await signOut(getAuth(app));
+        setError('This account is suspended. Contact support for help.');
+        setLoading(false);
+        return;
+      }
+
+      login(userData);
+      navigate(roleHomePath(role));
+    } catch (err: any) {
+      console.error(err);
+      setError('Failed to sign in. Please check your email and password.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -53,6 +93,11 @@ export default function LoginEventnic() {
           </p>
 
           <div className="mt-8">
+            {error && (
+              <div className="mb-4 rounded-lg bg-red-50 p-4 border border-red-200">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
             <form className="space-y-5" onSubmit={handleSubmit}>
 
               <div>
@@ -65,7 +110,7 @@ export default function LoginEventnic() {
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-on-surface">Password</label>
                 <div className="mt-1">
-                  <input id="password" name="password" type="password" required placeholder="••••••••" className="block w-full appearance-none rounded-lg border border-outline-variant px-3 py-2 text-on-surface placeholder-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm transition-all" />
+                  <input id="password" name="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" className="block w-full appearance-none rounded-lg border border-outline-variant px-3 py-2 text-on-surface placeholder-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm transition-all" />
                 </div>
               </div>
 
@@ -81,18 +126,11 @@ export default function LoginEventnic() {
               </div>
 
               <div>
-                <button type="submit" className="flex w-full justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-container hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all">
-                  Sign in
+                <button type="submit" disabled={loading} className="flex w-full justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-primary-container hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-all disabled:opacity-50">
+                  {loading ? 'Signing in...' : 'Sign in'}
                 </button>
               </div>
             </form>
-
-            <p className="mt-6 text-xs text-secondary text-center leading-relaxed">
-              Demo accounts (any password): <span className="font-medium text-on-surface">admin@eventnic.com</span>,{' '}
-              <span className="font-medium text-on-surface">organizer@eventnic.com</span>,{' '}
-              <span className="font-medium text-on-surface">nominee@eventnic.com</span>.
-              <br />Your access level is determined by your account, not selected here.
-            </p>
           </div>
         </div>
       </div>

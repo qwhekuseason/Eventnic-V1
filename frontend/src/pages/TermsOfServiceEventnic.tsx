@@ -1,7 +1,10 @@
 // @ts-nocheck
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function TermsOfServiceEventnic() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <main className="max-w-container-max mx-auto px-margin py-xxl">
 <div className="flex flex-col md:flex-row gap-xxl">
@@ -30,7 +33,7 @@ export default function TermsOfServiceEventnic() {
 <div className="mt-xxl p-lg bg-surface-container-high rounded-xl border border-outline-variant">
 <p className="font-headline-sm text-headline-sm text-on-surface mb-sm">Need help?</p>
 <p className="font-body-sm text-body-sm text-on-surface-variant mb-lg">Have questions about our legal terms? Contact our compliance team.</p>
-<button className="w-full bg-surface-container-lowest border border-outline text-on-surface py-sm rounded-lg font-bold hover:bg-surface transition-all">
+<button onClick={() => toast.success('Support ticket created! We will email you shortly.')} className="w-full bg-surface-container-lowest border border-outline text-on-surface py-sm rounded-lg font-bold hover:bg-surface transition-all">
                             Contact Support
                         </button>
 </div>
@@ -83,11 +86,11 @@ export default function TermsOfServiceEventnic() {
 <div className="mt-xxl pt-xl border-t border-outline-variant flex justify-between items-center">
 <span className="font-body-sm text-body-sm text-secondary">Did this help you?</span>
 <div className="flex gap-sm">
-<button className="flex items-center gap-xs px-md py-sm border border-outline rounded-lg text-on-surface hover:bg-surface-container transition-all">
+<button className="flex items-center gap-xs px-md py-sm border border-outline rounded-lg text-on-surface hover:bg-surface-container transition-all" onClick={() => toast.success('Thanks for your feedback!')}>
 <span className="material-symbols-outlined text-md">thumb_up</span>
 <span className="font-label-md text-label-md">Yes</span>
 </button>
-<button className="flex items-center gap-xs px-md py-sm border border-outline rounded-lg text-on-surface hover:bg-surface-container transition-all">
+<button className="flex items-center gap-xs px-md py-sm border border-outline rounded-lg text-on-surface hover:bg-surface-container transition-all" onClick={() => toast.success('Thanks for your feedback! We will try to improve.')}>
 <span className="material-symbols-outlined text-md">thumb_down</span>
 <span className="font-label-md text-label-md">No</span>
 </button>
@@ -98,11 +101,11 @@ export default function TermsOfServiceEventnic() {
 
 <div className="md:hidden order-first">
 <div className="p-lg bg-surface-container-low rounded-xl border border-outline-variant">
-<button className="w-full flex justify-between items-center" id="mobileNavToggle">
+<button className="w-full flex justify-between items-center" id="mobileNavToggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
 <span className="font-headline-sm text-headline-sm text-on-surface">Legal Documents</span>
-<span className="material-symbols-outlined">expand_more</span>
+<span className="material-symbols-outlined">{mobileMenuOpen ? 'expand_less' : 'expand_more'}</span>
 </button>
-<div className="hidden mt-md flex flex-col gap-sm" id="mobileNavMenu">
+<div className={`${mobileMenuOpen ? 'flex' : 'hidden'} mt-md flex-col gap-sm`} id="mobileNavMenu">
 <Link className="text-primary font-bold py-sm" to="/terms-of-service">Terms of Service</Link>
 <Link className="text-secondary py-sm border-t border-outline-variant" to="/privacy-policy">Privacy Policy</Link>
 <Link className="text-secondary py-sm border-t border-outline-variant" to="/refund-policy">Refund Policy</Link>

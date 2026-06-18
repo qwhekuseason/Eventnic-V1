@@ -12,19 +12,29 @@ export default function CreateEventReviewEventnic() {
 
   const handleBack = () => navigate('/create-event/schedule');
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!draft.title.trim()) {
       alert('Your event needs a title. Go back to Basic Info to add one.');
+      return;
+    }
+    if (draft.votingEnabled && !draft.votingEndDate) {
+      alert('Please add a voting end date before submitting this event.');
       return;
     }
     if (!agreed) {
       alert('Please confirm the information is accurate before publishing.');
       return;
     }
-    createEvent(draft, 'pending', user?.email || 'unknown', user?.name || 'Organizer');
-    resetDraft();
-    alert('Event submitted! It will go live once an admin approves it.');
-    navigate('/dashboard');
+
+    try {
+      await createEvent(draft, 'pending', user?.email || 'unknown', user?.name || 'Organizer', user?.votePrice || 0);
+      resetDraft();
+      alert('Event submitted! It will go live once an admin approves it.');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Failed to submit event:', error);
+      alert('Unable to submit event. Please try again or check your network.');
+    }
   };
 
   const steps = ['Basic Info', 'Tickets', 'Schedule', 'Review'];
@@ -84,7 +94,19 @@ export default function CreateEventReviewEventnic() {
                 {draft.speakers.length > 0 && (
                   <div>
                     <label className="block font-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Speakers</label>
-                    <p className="font-body-sm text-body-sm">{draft.speakers.map((s) => s.name).filter(Boolean).join(', ')}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+                      {draft.speakers.map((s) => (
+                        <div key={s.id} className="flex items-center gap-md bg-surface-container rounded-xl p-md">
+                          <div className="w-16 h-16 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+                            {s.imageUrl ? <img className="w-full h-full object-cover" src={s.imageUrl} alt={s.name || 'Speaker'} /> : <span className="material-symbols-outlined text-primary">person</span>}
+                          </div>
+                          <div>
+                            <p className="font-body-md font-semibold text-on-surface">{s.name || 'Unnamed speaker'}</p>
+                            <p className="text-secondary text-sm">{s.title || 'Title not set'}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -131,10 +153,23 @@ export default function CreateEventReviewEventnic() {
                 <button onClick={() => navigate('/create-event/basic-info')} className="text-primary hover:bg-primary-fixed px-md py-sm rounded-lg transition-all flex items-center gap-xs font-label-md"><span className="material-symbols-outlined !text-[18px]">edit</span> Edit</button>
               </div>
               <div className="space-y-sm">
+                <div className="text-body-sm text-secondary mb-md">Voting ends on: {draft.votingEndDate || 'Not set'}</div>
                 {draft.votingCategories.map((c) => (
                   <div key={c.id} className="border-l-4 border-primary pl-md py-xs">
                     <h3 className="font-label-md text-primary">{c.name || 'Untitled category'}</h3>
-                    <p className="font-body-sm text-on-surface-variant">{c.nominees.map((n) => n.name).filter(Boolean).join(', ') || 'No nominees'}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                      {c.nominees.map((n) => (
+                        <div key={n.id} className="flex items-center gap-md bg-surface-container rounded-xl p-md">
+                          <div className="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+                            {n.imageUrl ? <img className="w-full h-full object-cover" src={n.imageUrl} alt={n.name || 'Nominee'} /> : <span className="material-symbols-outlined text-primary">emoji_events</span>}
+                          </div>
+                          <div>
+                            <p className="font-body-md font-semibold text-on-surface">{n.name || 'Unnamed nominee'}</p>
+                            <p className="text-secondary text-sm">{n.description || 'No description'}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>

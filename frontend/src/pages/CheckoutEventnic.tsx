@@ -1,7 +1,9 @@
 // @ts-nocheck
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEvents } from '../contexts/EventsContext';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { app } from '../config/firebase';
 
 const money = (n) => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -14,15 +16,92 @@ export default function CheckoutEventnic() {
   const event = params.get('event') ? getEvent(params.get('event')) : null;
   const tier = event ? event.ticketTiers.find((t) => t.id === params.get('tier')) : null;
 
+  const [platformSettings, setPlatformSettings] = useState({ deductionFeePercent: 5, baseVotePrice: 0 });
+  const [paystackLoaded, setPaystackLoaded] = useState(false);
+  const [paystackError, setPaystackError] = useState('');
+  const db = getFirestore(app);
+
   const unit = tier ? Number(tier.price) : 0;
   const remaining = tier ? Math.max(0, tier.quantity - tier.sold) : 0;
   const subtotal = unit * qty;
-  const serviceFee = Math.round(subtotal * 0.05 * 100) / 100;
+  const serviceFee = Math.round(subtotal * (platformSettings.deductionFeePercent / 100) * 100) / 100;
   const total = subtotal + serviceFee;
 
-  const completePurchase = () => {
-    if (event && tier) recordPurchase(event.id, tier.id, qty);
+  useEffect(() => {
+    const loadScript = () => {
+      if (window.PaystackPop) {
+        setPaystackLoaded(true);
+        return;
+      }
+      if (document.getElementById('paystack-js')) {
+        return;
+      }
+      const script = document.createElement('script');
+      script.id = 'paystack-js';
+      script.src = 'https://js.paystack.co/v1/inline.js';
+      script.async = true;
+      script.onload = () => setPaystackLoaded(true);
+      script.onerror = () => setPaystackError('Unable to load Paystack checkout script.');
+      document.body.appendChild(script);
+    };
+
+    const fetchSettings = async () => {
+      try {
+        const financeDoc = await getDoc(doc(db, 'platformSettings', 'finance'));
+        if (financeDoc.exists()) {
+          const data = financeDoc.data();
+          setPlatformSettings({
+            deductionFeePercent: Number(data.deductionFeePercent) || 5,
+            baseVotePrice: Number(data.baseVotePrice) || 0,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load platform settings:', error);
+      }
+    };
+
+    loadScript();
+    fetchSettings();
+  }, []);
+
+  const completePurchase = async () => {
+    if (event && tier) {
+      await recordPurchase(event.id, tier.id, qty);
+      alert('Success! Confirmation email sent with your ticket numbers.');
+    }
     navigate('/payment-success');
+  };
+
+  const payWithPaystack = async () => {
+    if (!event || !tier) return;
+    if (!window.PaystackPop) {
+      setPaystackError('Paystack is not available. Please try again later.');
+      return;
+    }
+
+    const email = 'guest@eventnic.com';
+    const handler = window.PaystackPop.setup({
+      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxx',
+      email,
+      amount: Math.round(total * 100),
+      currency: 'NGN',
+      ref: `eventnic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      metadata: {
+        custom_fields: [
+          { display_name: 'Event title', variable_name: 'event_title', value: event.title },
+          { display_name: 'Ticket tier', variable_name: 'tier_name', value: tier.name },
+        ],
+      },
+      callback: async () => {
+        await recordPurchase(event.id, tier.id, qty);
+        navigate('/payment-success');
+      },
+      onClose: () => {
+        alert('Payment cancelled.');
+      },
+    });
+
+    handler.openIframe();
   };
 
   return (
@@ -132,7 +211,7 @@ export default function CheckoutEventnic() {
                   <div className="h-[1px] bg-outline-variant my-md"></div>
                   <div className="space-y-sm">
                     <div className="flex justify-between font-body-md text-body-md"><span className="text-on-surface-variant">Subtotal ({qty}x {money(unit)})</span><span>{money(subtotal)}</span></div>
-                    <div className="flex justify-between font-body-md text-body-md"><span className="text-on-surface-variant">Service Fee (5%)</span><span>{money(serviceFee)}</span></div>
+                    <div className="flex justify-between font-body-md text-body-md"><span className="text-on-surface-variant">Service Fee ({platformSettings.deductionFeePercent}%)</span><span>{money(serviceFee)}</span></div>
                   </div>
                   <div className="h-[1px] bg-outline-variant my-md"></div>
                   <div className="flex justify-between items-center pt-base">
@@ -142,7 +221,13 @@ export default function CheckoutEventnic() {
                 </>
               )}
 
-              <button onClick={completePurchase} disabled={!event || !tier} className={`w-full py-md rounded-lg font-bold font-body-lg text-body-lg mt-lg shadow-md transition-all flex items-center justify-center gap-md ${!event || !tier ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : 'bg-primary text-on-primary hover:brightness-110 active:scale-[0.98]'}`}>
+              {paystackError && <div className="text-red-600 text-sm mt-md">{paystackError}</div>}
+
+              <button onClick={payWithPaystack} disabled={!event || !tier || !paystackLoaded} className={`w-full py-md rounded-lg font-bold font-body-lg text-body-lg mt-lg shadow-md transition-all flex items-center justify-center gap-md ${!event || !tier || !paystackLoaded ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : 'bg-secondary text-on-secondary hover:brightness-110 active:scale-[0.98]'}`}>
+                Pay with Paystack
+                <span className="material-symbols-outlined">payment</span>
+              </button>
+              <button onClick={completePurchase} disabled={!event || !tier} className={`w-full py-md rounded-lg font-bold font-body-lg text-body-lg mt-md shadow-md transition-all flex items-center justify-center gap-md ${!event || !tier ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : 'bg-primary text-on-primary hover:brightness-110 active:scale-[0.98]'}`}>
                 Complete Purchase
                 <span className="material-symbols-outlined">arrow_forward</span>
               </button>

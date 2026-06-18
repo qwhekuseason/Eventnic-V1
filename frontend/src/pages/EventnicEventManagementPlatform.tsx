@@ -1,7 +1,10 @@
 // @ts-nocheck
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export default function EventnicEventManagementPlatform() {
+  const navigate = useNavigate();
+
   return (
     <main>
 
@@ -15,8 +18,8 @@ export default function EventnicEventManagementPlatform() {
                         The all-in-one platform for ticketing, attendee management, and real-time analytics. Build, manage, and scale your events with professional confidence.
                     </p>
 <div className="flex flex-wrap gap-md pt-md">
-<button className="bg-primary text-on-primary font-headline-sm px-xl py-md rounded-xl shadow-lg hover:bg-primary-container transition-all">Get Started for Free</button>
-<button className="bg-white border border-outline-variant text-on-surface font-headline-sm px-xl py-md rounded-xl hover:bg-surface-container-low transition-all flex items-center gap-sm">
+<button onClick={() => navigate('/signup')} className="bg-primary text-on-primary font-headline-sm px-xl py-md rounded-xl shadow-lg hover:bg-primary-container transition-all">Get Started for Free</button>
+<button onClick={() => toast.success('Demo video coming soon!')} className="bg-white border border-outline-variant text-on-surface font-headline-sm px-xl py-md rounded-xl hover:bg-surface-container-low transition-all flex items-center gap-sm">
 <span className="material-symbols-outlined">play_circle</span>
                             Watch Demo
                         </button>
@@ -48,7 +51,7 @@ export default function EventnicEventManagementPlatform() {
 </div>
 
 <div className="absolute top-0 right-0 -z-10 w-1/2 h-full opacity-10 pointer-events-none">
-<svg className="w-full h-full fill-primary" viewbox="0 0 100 100">
+<svg className="w-full h-full fill-primary" viewBox="0 0 100 100">
 <circle cx="80" cy="20" r="40"></circle>
 </svg>
 </div>
@@ -141,7 +144,7 @@ export default function EventnicEventManagementPlatform() {
 <span className="font-bold">Full Access</span>
 </li>
 </ul>
-<button className="w-full bg-primary text-on-primary font-headline-sm py-md rounded-xl shadow-lg hover:bg-primary-container transition-all">Select Pro Plan</button>
+<button onClick={() => toast.success('Pro Plan selected! Proceeding to checkout...')} className="w-full bg-primary text-on-primary font-headline-sm py-md rounded-xl shadow-lg hover:bg-primary-container transition-all">Select Pro Plan</button>
 </div>
 </div>
 </div>
@@ -157,7 +160,7 @@ export default function EventnicEventManagementPlatform() {
 <p className="text-on-primary-container font-body-lg mb-xl max-w-2xl mx-auto opacity-80">
                         Join over 10,000+ event organizers worldwide. From local workshops to global summits, Eventnic scales with you.
                     </p>
-<button className="bg-white text-primary font-headline-sm px-[48px] py-[20px] rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all">Create Event Now</button>
+<button onClick={() => navigate('/create-event/basic-info')} className="bg-white text-primary font-headline-sm px-[48px] py-[20px] rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all">Create Event Now</button>
 </div>
 </div>
 </section>

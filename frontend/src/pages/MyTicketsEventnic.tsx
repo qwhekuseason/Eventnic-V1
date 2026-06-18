@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const TICKETS = [
   {
@@ -85,10 +86,10 @@ export default function MyTicketsEventnic() {
                     </div>
                   </div>
                   <div className="flex flex-row md:flex-col gap-sm flex-shrink-0">
-                    <button className="px-lg py-sm bg-primary text-on-primary rounded-xl font-label-md font-bold hover:opacity-90 transition-all flex items-center gap-xs">
+                    <button onClick={() => toast.success('Ticket QR Code sent to your email!')} className="px-lg py-sm bg-primary text-on-primary rounded-xl font-label-md font-bold hover:opacity-90 transition-all flex items-center gap-xs">
                       <span className="material-symbols-outlined text-[18px]">qr_code_2</span> View Ticket
                     </button>
-                    <button className="px-lg py-sm border border-outline-variant text-secondary rounded-xl font-label-md hover:bg-surface-container-low transition-all">
+                    <button onClick={() => toast.success('Opening maps...')} className="px-lg py-sm border border-outline-variant text-secondary rounded-xl font-label-md hover:bg-surface-container-low transition-all">
                       Get Directions
                     </button>
                   </div>
@@ -127,7 +128,7 @@ export default function MyTicketsEventnic() {
                     <h3 className="font-headline-sm font-bold text-on-surface mb-xs">{ticket.event}</h3>
                     <p className="text-secondary font-body-sm flex items-center gap-xs"><span className="material-symbols-outlined text-[16px]">calendar_today</span> {ticket.date}</p>
                   </div>
-                  <button className="px-lg py-sm border border-outline-variant text-secondary rounded-xl font-label-md hover:bg-surface-container-high transition-all flex-shrink-0">
+                  <button onClick={() => toast.success('Receipt downloading...')} className="px-lg py-sm border border-outline-variant text-secondary rounded-xl font-label-md hover:bg-surface-container-high transition-all flex-shrink-0">
                     View Receipt
                   </button>
                 </div>

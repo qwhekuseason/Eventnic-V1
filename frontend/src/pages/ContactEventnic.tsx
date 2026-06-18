@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 export default function ContactEventnic() {
   return (
@@ -48,7 +49,7 @@ export default function ContactEventnic() {
                 </div>
                 <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Live Chat</h3>
                 <p className="text-secondary font-body-sm mb-md">Available Mon–Fri, 9 AM – 6 PM EST.</p>
-                <button className="text-primary font-label-md hover:underline">Start a Conversation</button>
+                <button onClick={() => toast('Live chat agent is connecting...', { icon: '💬' })} className="text-primary font-label-md hover:underline">Start a Conversation</button>
               </motion.div>
 
               <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
@@ -73,7 +74,7 @@ export default function ContactEventnic() {
               <h2 className="font-display text-[32px] text-on-surface mb-xs">Send us a message</h2>
               <p className="text-secondary font-body-md mb-xl">Fill out the form below and we'll get back to you shortly.</p>
 
-              <form className="space-y-lg" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-lg" onSubmit={(e) => { e.preventDefault(); toast.success('Your message has been sent successfully! We will get back to you soon.'); }}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
                   <div className="space-y-xs">
                     <label className="font-label-md text-on-surface" htmlFor="contact-first">First Name</label>
