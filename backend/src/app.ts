@@ -1,22 +1,48 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import './config/firebase';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { handleUSSD } from './modules/ussd';
+import { createEvent, purchaseTicket, castVote } from './modules/events';
+import { sendBroadcast } from './modules/email';
+import { paystackWebhook } from './modules/webhooks';
+import { validate } from './middleware/validate';
+import { createEventSchema, purchaseTicketSchema, castVoteSchema, broadcastSchema } from './validators/events';
 
 dotenv.config();
 
 const app = express();
 
 // Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// Rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+});
+app.use('/api/', apiLimiter);
 
 // Routes
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', message: 'Eventnic API is running' });
 });
+
+// USSD Gateway Route
+app.post('/api/ussd', handleUSSD);
+
+// Events API (Secure Backend integration)
+app.post('/api/events/create', validate(createEventSchema), createEvent);
+app.post('/api/events/purchase', validate(purchaseTicketSchema), purchaseTicket);
+app.post('/api/events/vote', validate(castVoteSchema), castVote);
+app.post('/api/broadcasts/send', validate(broadcastSchema), sendBroadcast);
+app.post('/api/webhooks/paystack', paystackWebhook);
 
 // Example route using Firebase Admin
 app.get('/api/verify-auth', async (req: Request, res: Response): Promise<void> => {

@@ -1,13 +1,13 @@
-// @ts-nocheck
+// Removed unused useState, useEffect
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEvents } from '../contexts/EventsContext';
 
-export default function PublicEventPageTechpulseGlobal2024() {
+export default function PublicEventPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { getEvent, castVote, hasVoted } = useEvents();
+  const { getEvent } = useEvents();
 
-  const event = getEvent(slug);
+  const event = getEvent(slug || '');
 
   if (!event) {
     return (
@@ -19,10 +19,7 @@ export default function PublicEventPageTechpulseGlobal2024() {
     );
   }
 
-  const vote = (categoryId, nomineeId, nomineeName) => {
-    const ok = castVote(event.id, categoryId, nomineeId);
-    alert(ok ? `Vote recorded for ${nomineeName}!` : 'You have already voted in this category.');
-  };
+
 
   return (
     <main>
@@ -32,7 +29,7 @@ export default function PublicEventPageTechpulseGlobal2024() {
           {event.coverImage ? (
             <img alt={event.title} className="w-full h-full object-cover" src={event.coverImage} />
           ) : (
-            <div className="w-full h-full bg-gradient-dark"></div>
+            <div className="w-full h-full hero-section"></div>
           )}
           <div className="absolute inset-0 bg-gradient-to-r from-on-background/80 to-on-background/30"></div>
         </div>
@@ -67,7 +64,7 @@ export default function PublicEventPageTechpulseGlobal2024() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-lg">
             {event.speakers.map((s) => (
-              <div key={s.id} className="bg-white border border-outline-variant rounded-xl p-lg flex flex-col items-center text-center shadow-sm">
+              <div key={s.id} className="bg-surface border border-outline-variant rounded-xl p-lg flex flex-col items-center text-center shadow-sm">
                 <div className="w-20 h-20 rounded-full overflow-hidden bg-surface-container-high text-primary flex items-center justify-center mb-md">
                   {s.imageUrl ? (
                     <img className="w-full h-full object-cover" src={s.imageUrl} alt={s.name || 'Speaker'} />
@@ -93,7 +90,7 @@ export default function PublicEventPageTechpulseGlobal2024() {
             </div>
             <div className="space-y-md">
               {event.agenda.map((a) => (
-                <div key={a.id} className="flex flex-col md:flex-row gap-lg bg-white p-lg rounded-xl border border-outline-variant hover:border-primary transition-all">
+                <div key={a.id} className="flex flex-col md:flex-row gap-lg bg-surface p-lg rounded-xl border border-outline-variant hover:border-primary transition-all">
                   <div className="md:w-32">
                     <span className="font-headline-sm text-headline-sm text-primary">{a.start || 'TBA'}</span>
                     {a.end && <div className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">until {a.end}</div>}
@@ -121,21 +118,21 @@ export default function PublicEventPageTechpulseGlobal2024() {
               const soldOut = t.sold >= t.quantity && t.quantity > 0;
               const popular = i === 1;
               return (
-                <div key={t.id} className={`bg-white p-xl rounded-xl flex flex-col h-full ${popular ? 'border-2 border-primary shadow-md relative' : 'border border-outline-variant shadow-sm'}`}>
+                <div key={t.id} className={`bg-surface p-xl rounded-xl flex flex-col h-full ${popular ? 'border-2 border-primary shadow-md relative' : 'border border-outline-variant shadow-sm'}`}>
                   {popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-lg py-xs rounded-full font-label-sm text-label-sm">MOST POPULAR</div>}
                   <div className="mb-lg">
-                    <span className={`px-md py-xs rounded-full font-label-sm text-label-sm uppercase tracking-widest ${soldOut ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-100 text-green-700'}`}>{soldOut ? 'Sold Out' : 'On Sale'}</span>
+                    <span className={`px-md py-xs rounded-full font-label-sm text-label-sm uppercase tracking-widest ${soldOut ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-100 text-emerald-600 dark:text-emerald-400'}`}>{soldOut ? 'Sold Out' : 'On Sale'}</span>
                     <h3 className="font-headline-md text-headline-md mt-md">{t.name}</h3>
                   </div>
                   <div className="mb-xl">
-                    <span className="font-display text-[40px] leading-none text-on-surface">${Number(t.price).toLocaleString()}</span>
+                    <span className="font-display text-[40px] leading-none text-on-surface">GH₵ {Number(t.price).toLocaleString()}</span>
                     <span className="text-secondary font-body-md">/person</span>
                   </div>
                   <div className="flex-1 mb-xl text-secondary font-body-sm">{Math.max(0, t.quantity - t.sold).toLocaleString()} tickets remaining</div>
                   <button
                     disabled={soldOut}
                     onClick={() => navigate(`/checkout?event=${event.id}&tier=${t.id}`)}
-                    className={`w-full py-md font-bold rounded-lg transition-all font-label-md text-label-md ${soldOut ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : popular ? 'bg-primary text-on-primary hover:opacity-90' : 'border border-outline hover:bg-surface-container'}`}
+                    className={`w-full ${soldOut ? 'bg-surface-container-high text-on-surface-variant py-base rounded-xl font-bold font-label-md cursor-not-allowed' : popular ? 'btn-primary' : 'btn-outline'}`}
                   >
                     {soldOut ? 'Sold Out' : 'Buy Tickets'}
                   </button>
@@ -146,61 +143,23 @@ export default function PublicEventPageTechpulseGlobal2024() {
         </section>
       )}
 
-      {/* Voting */}
+      {/* Voting CTA */}
       {event.votingEnabled && event.votingCategories.length > 0 && (
         <section className="py-xxl bg-surface-container-lowest border-t border-b border-outline-variant">
-          <div className="max-w-container-max mx-auto px-margin">
-            <div className="text-center mb-xl">
-              <span className="bg-tertiary-container text-on-tertiary-container px-md py-xs rounded-full font-label-sm uppercase tracking-widest mb-md inline-block">Live Voting</span>
-              <h2 className="font-headline-lg text-headline-lg text-on-surface">Community Awards</h2>
-              <p className="font-body-md text-body-md text-secondary mb-md">Cast your vote for the innovators shaping the future. No account required.</p>
-              {event.votingEndDate && <p className="font-body-sm text-secondary mb-md">Voting closes on {event.votingEndDate}.</p>}
-              <Link to={`/event/${event.slug}/nominate`} className="inline-block bg-surface border border-outline hover:border-primary text-primary font-bold px-lg py-sm rounded-full transition-colors">
+          <div className="max-w-container-max mx-auto px-margin text-center">
+            <span className="bg-tertiary-container text-on-tertiary-container px-md py-xs rounded-full font-label-sm uppercase tracking-widest mb-md inline-block">Live Voting Active</span>
+            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-md">Community Awards</h2>
+            <p className="font-body-lg text-body-lg text-secondary mb-xl max-w-2xl mx-auto">
+              Cast your vote for the innovators shaping the future. Support your favorite nominees or nominate someone new!
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-md">
+              <Link to={`/event/${event.slug}/vote`} className="btn-primary">
+                Go to Voting Platform
+              </Link>
+              <Link to={`/event/${event.slug}/nominate`} className="btn-outline">
                 Nominate Someone
               </Link>
             </div>
-
-            {event.votingCategories.map((cat) => {
-              const total = cat.nominees.reduce((n, x) => n + x.votes, 0);
-              const voted = hasVoted(event.id, cat.id);
-              return (
-                <div key={cat.id} className="mb-xxl">
-                  <div className="flex items-center justify-between mb-md">
-                    <h3 className="font-headline-md text-on-surface">{cat.name}</h3>
-                    {voted && <span className="text-primary font-label-md flex items-center gap-xs"><span className="material-symbols-outlined text-[18px]">check_circle</span> You voted</span>}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-                    {cat.nominees.map((nom) => {
-                      const share = total > 0 ? Math.round((nom.votes / total) * 100) : 0;
-                      return (
-                        <div key={nom.id} className="bg-white p-lg rounded-xl border border-outline-variant flex flex-col text-center shadow-sm hover:border-primary transition-all">
-                          <div className="w-20 h-20 rounded-full mb-md overflow-hidden mx-auto bg-surface-container-high flex items-center justify-center">
-                            {nom.imageUrl ? (
-                              <img className="w-full h-full object-cover" src={nom.imageUrl} alt={nom.name || 'Nominee'} />
-                            ) : (
-                              <span className="material-symbols-outlined text-[36px]">emoji_events</span>
-                            )}
-                          </div>
-                          <h4 className="font-headline-sm font-bold text-on-surface">{nom.name}</h4>
-                          <p className="text-secondary font-body-sm mb-md">{nom.description}</p>
-                          <div className="mb-md">
-                            <div className="flex justify-between text-label-sm mb-xs"><span className="text-on-surface font-bold">{nom.votes.toLocaleString()} votes</span><span className="text-secondary">{share}%</span></div>
-                            <div className="w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div className="bg-tertiary h-2 rounded-full" style={{ width: `${share}%` }}></div></div>
-                          </div>
-                          <button
-                            disabled={voted}
-                            onClick={() => vote(cat.id, nom.id, nom.name)}
-                            className={`mt-auto w-full py-sm font-bold rounded-full transition-all flex items-center justify-center gap-xs ${voted ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : 'border-2 border-primary text-primary hover:bg-primary hover:text-white'}`}
-                          >
-                            <span className="material-symbols-outlined text-[18px]">how_to_vote</span> {voted ? 'Voted' : 'Vote'}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </section>
       )}

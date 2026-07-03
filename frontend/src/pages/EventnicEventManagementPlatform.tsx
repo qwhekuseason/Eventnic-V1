@@ -19,7 +19,7 @@ export default function EventnicEventManagementPlatform() {
                     </p>
 <div className="flex flex-wrap gap-md pt-md">
 <button onClick={() => navigate('/signup')} className="bg-primary text-on-primary font-headline-sm px-xl py-md rounded-xl shadow-lg hover:bg-primary-container transition-all">Get Started for Free</button>
-<button onClick={() => toast.success('Demo video coming soon!')} className="bg-white border border-outline-variant text-on-surface font-headline-sm px-xl py-md rounded-xl hover:bg-surface-container-low transition-all flex items-center gap-sm">
+<button onClick={() => toast.success('Demo video coming soon!')} className="bg-surface border border-outline-variant text-on-surface font-headline-sm px-xl py-md rounded-xl hover:bg-surface-container-low transition-all flex items-center gap-sm">
 <span className="material-symbols-outlined">play_circle</span>
                             Watch Demo
                         </button>
@@ -42,7 +42,7 @@ export default function EventnicEventManagementPlatform() {
 <p className="text-label-md opacity-80 uppercase tracking-widest">Real-time Sales</p>
 <p className="text-headline-lg font-bold">$124,500.00</p>
 <div className="w-full h-2 bg-white/20 rounded-full mt-md">
-<div className="w-[75%] h-full bg-white rounded-full"></div>
+<div className="w-[75%] h-full bg-surface rounded-full"></div>
 </div>
 </div>
 </div>
@@ -65,7 +65,7 @@ export default function EventnicEventManagementPlatform() {
 </div>
 <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
 
-<div className="p-xl rounded-xxl bg-white border border-outline-variant hover:border-primary hover:shadow-lg transition-all group">
+<div className="p-xl rounded-xxl bg-surface border border-outline-variant hover:border-primary hover:shadow-lg transition-all group">
 <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-lg group-hover:bg-primary group-hover:text-white transition-colors">
 <span className="material-symbols-outlined">confirmation_number</span>
 </div>
@@ -73,7 +73,7 @@ export default function EventnicEventManagementPlatform() {
 <p className="text-secondary body-md">Launch customized ticket tiers in minutes. Multi-currency support and secure checkout come standard.</p>
 </div>
 
-<div className="p-xl rounded-xxl bg-white border border-outline-variant hover:border-primary hover:shadow-lg transition-all group">
+<div className="p-xl rounded-xxl bg-surface border border-outline-variant hover:border-primary hover:shadow-lg transition-all group">
 <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-lg group-hover:bg-primary group-hover:text-white transition-colors">
 <span className="material-symbols-outlined">analytics</span>
 </div>
@@ -81,7 +81,7 @@ export default function EventnicEventManagementPlatform() {
 <p className="text-secondary body-md">Track conversions, source attribution, and attendee demographics with real-time dashboard updates.</p>
 </div>
 
-<div className="p-xl rounded-xxl bg-white border border-outline-variant hover:border-primary hover:shadow-lg transition-all group">
+<div className="p-xl rounded-xxl bg-surface border border-outline-variant hover:border-primary hover:shadow-lg transition-all group">
 <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-lg group-hover:bg-primary group-hover:text-white transition-colors">
 <span className="material-symbols-outlined">how_to_reg</span>
 </div>
@@ -117,7 +117,7 @@ export default function EventnicEventManagementPlatform() {
 <div className="relative">
 
 <div className="absolute -inset-4 bg-primary/10 blur-3xl rounded-full"></div>
-<div className="relative bg-white p-xl rounded-xxl border-2 border-primary shadow-2xl max-w-[448px] mx-auto">
+<div className="relative bg-surface p-xl rounded-xxl border-2 border-primary shadow-2xl max-w-[448px] mx-auto">
 <div className="absolute top-0 right-12 -translate-y-1/2 bg-primary text-on-primary text-label-md px-lg py-1 rounded-full uppercase tracking-widest">Most Popular</div>
 <div className="mb-xl">
 <h4 className="font-headline-sm text-primary mb-xs">Pro Plan</h4>
@@ -160,7 +160,7 @@ export default function EventnicEventManagementPlatform() {
 <p className="text-on-primary-container font-body-lg mb-xl max-w-2xl mx-auto opacity-80">
                         Join over 10,000+ event organizers worldwide. From local workshops to global summits, Eventnic scales with you.
                     </p>
-<button onClick={() => navigate('/create-event/basic-info')} className="bg-white text-primary font-headline-sm px-[48px] py-[20px] rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all">Create Event Now</button>
+<button onClick={() => navigate('/create-event/basic-info')} className="bg-surface text-primary font-headline-sm px-[48px] py-[20px] rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all">Create Event Now</button>
 </div>
 </div>
 </section>

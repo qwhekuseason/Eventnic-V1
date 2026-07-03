@@ -36,25 +36,25 @@ export default function AdminEventModeration() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
-          <div className="bg-amber-50 rounded-2xl p-lg border border-amber-200 shadow-sm flex items-center gap-md">
-            <div className="w-12 h-12 rounded-xl bg-amber-200 text-amber-700 flex items-center justify-center"><span className="material-symbols-outlined">hourglass_top</span></div>
+          <div className="bg-amber-500/10 rounded-2xl p-lg border border-amber-500/30 shadow-sm flex items-center gap-md">
+            <div className="w-12 h-12 rounded-xl bg-amber-200 text-amber-600 dark:text-amber-400 flex items-center justify-center"><span className="material-symbols-outlined">hourglass_top</span></div>
             <div>
-              <div className="font-display text-[28px] text-amber-700">{counts.pending}</div>
+              <div className="font-display text-[28px] text-amber-600 dark:text-amber-400">{counts.pending}</div>
               <div className="text-amber-600 font-body-sm font-medium">Pending Review</div>
             </div>
           </div>
-          <div className="bg-green-50 rounded-2xl p-lg border border-green-200 shadow-sm flex items-center gap-md">
-            <div className="w-12 h-12 rounded-xl bg-green-200 text-green-700 flex items-center justify-center"><span className="material-symbols-outlined">check_circle</span></div>
+          <div className="bg-emerald-500/10 rounded-2xl p-lg border border-emerald-500/30 shadow-sm flex items-center gap-md">
+            <div className="w-12 h-12 rounded-xl bg-green-200 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"><span className="material-symbols-outlined">check_circle</span></div>
             <div>
-              <div className="font-display text-[28px] text-green-700">{counts.published}</div>
-              <div className="text-green-600 font-body-sm font-medium">Approved</div>
+              <div className="font-display text-[28px] text-emerald-600 dark:text-emerald-400">{counts.published}</div>
+              <div className="text-emerald-600 dark:text-emerald-400 font-body-sm font-medium">Approved</div>
             </div>
           </div>
-          <div className="bg-red-50 rounded-2xl p-lg border border-red-200 shadow-sm flex items-center gap-md">
-            <div className="w-12 h-12 rounded-xl bg-red-200 text-red-700 flex items-center justify-center"><span className="material-symbols-outlined">cancel</span></div>
+          <div className="bg-error-container rounded-2xl p-lg border border-error/30 shadow-sm flex items-center gap-md">
+            <div className="w-12 h-12 rounded-xl bg-red-200 text-on-error-container flex items-center justify-center"><span className="material-symbols-outlined">cancel</span></div>
             <div>
-              <div className="font-display text-[28px] text-red-700">{counts.rejected}</div>
-              <div className="text-red-600 font-body-sm font-medium">Rejected</div>
+              <div className="font-display text-[28px] text-on-error-container">{counts.rejected}</div>
+              <div className="text-error font-body-sm font-medium">Rejected</div>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@ export default function AdminEventModeration() {
               <div className="flex-1">
                 <div className="flex items-center gap-sm mb-xs">
                   <h3 className="font-bold text-on-surface text-lg">{event.title}</h3>
-                  <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold capitalize ${event.status === 'pending' ? 'bg-amber-100 text-amber-700 border border-amber-200' : event.status === 'published' ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
+                  <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold capitalize ${event.status === 'pending' ? 'bg-amber-100 text-amber-600 dark:text-amber-400 border border-amber-500/30' : event.status === 'published' ? 'bg-green-100 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-red-100 text-on-error-container border border-error/30'}`}>
                     {statusLabel(event.status)}
                   </span>
                 </div>
@@ -94,7 +94,7 @@ export default function AdminEventModeration() {
               <div className="flex gap-sm">
                 {event.status === 'pending' ? (
                   <>
-                    <button onClick={() => rejectEvent(event.id)} className="px-md py-sm rounded-xl border border-red-300 text-red-600 font-bold font-label-md hover:bg-red-50 transition-colors">Reject</button>
+                    <button onClick={() => rejectEvent(event.id)} className="px-md py-sm rounded-xl border border-red-300 text-error font-bold font-label-md hover:bg-error-container transition-colors">Reject</button>
                     <button onClick={() => approveEvent(event.id)} className="px-md py-sm rounded-xl bg-primary text-white font-bold font-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm">Approve</button>
                   </>
                 ) : (

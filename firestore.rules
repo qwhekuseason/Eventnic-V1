@@ -30,22 +30,23 @@ service cloud.firestore {
     // Events collection
     match /events/{eventId} {
       allow read: if true; // Anyone can read events
-      allow create: if isOrganizer();
-      allow update: if (isOrganizer() && resource.data.organizerEmail == request.auth.token.email) || isAdmin() || (isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votingCategories', 'ticketTiers']));
+      allow create: if false; // Must be created via secure Backend API
+      allow update: if (isAuthenticated() && isOrganizer() && resource.data.organizerEmail == request.auth.token.email)
+                    || (isAuthenticated() && isAdmin());
       allow delete: if (isOrganizer() && resource.data.organizerEmail == request.auth.token.email) || isAdmin();
     }
     
     // Votes collection
     match /votes/{voteId} {
       allow read: if true; // Open to calculate results
-      allow create: if true; // Anonymous voting allowed
+      allow create: if false; // Must use Backend API
       allow update, delete: if false; // Votes are immutable
     }
 
     // Tickets collection
     match /tickets/{ticketId} {
       allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow create: if false; // Must use Backend API
       allow update: if isAuthenticated(); // Organizers need to check them in, users might transfer
       allow delete: if isAdmin();
     }
@@ -62,8 +63,29 @@ service cloud.firestore {
       allow read: if true;
       allow create, update, delete: if isOrganizer() || isAdmin();
     }
+
+    // Platform settings (finance, etc.)
+    match /platformSettings/{docId} {
+      allow read: if true; // Anyone can read platform settings (e.g. fee percentages)
+      allow write: if isAuthenticated() && isAdmin();
+    }
+
+    // Transactions collection
+    match /transactions/{transactionId} {
+      allow read: if isAuthenticated();
+      allow create: if true; // Created during checkout
+      allow update, delete: if isAuthenticated() && isAdmin();
+    }
     
-    // Default closed
+    // Withdrawal Requests
+    match /withdrawalRequests/{requestId} {
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow read: if isAuthenticated() && isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isAuthenticated() && isAdmin();
+    }
+    
+    // Default closed — any collection not explicitly listed above is blocked
     match /{document=**} {
       allow read, write: if false;
     }

@@ -20,7 +20,7 @@ export default function AboutEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero */}
-      <section className="relative pt-[160px] pb-[100px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[100px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[30%] right-[10%] w-[600px] h-[600px] rounded-full bg-tertiary/20 blur-[120px]" />
           <div className="absolute bottom-[-20%] -left-[5%] w-[500px] h-[500px] rounded-full bg-primary/30 blur-[100px]" />
@@ -118,7 +118,7 @@ export default function AboutEventnic() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="bg-white rounded-[24px] p-xl border border-outline-variant shadow-lg text-center"
+                className="bg-surface rounded-[24px] p-xl border border-outline-variant shadow-lg text-center"
               >
                 <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-lg border-4 border-primary-fixed">
                   <img src={person.img} alt={person.name} className="w-full h-full object-cover" />
@@ -133,13 +133,13 @@ export default function AboutEventnic() {
 
       {/* CTA */}
       <section className="py-[100px] px-margin">
-        <div className="max-w-container-max mx-auto rounded-[40px] bg-gradient-dark p-xl md:p-[80px] text-center relative overflow-hidden shadow-2xl">
+        <div className="max-w-container-max mx-auto rounded-[40px] hero-section p-xl md:p-[80px] text-center relative overflow-hidden shadow-2xl">
           <div className="absolute -top-[50%] -left-[10%] w-[500px] h-[500px] rounded-full bg-primary/30 blur-[80px]"></div>
           <div className="absolute -bottom-[50%] -right-[10%] w-[500px] h-[500px] rounded-full bg-tertiary/20 blur-[80px]"></div>
           <div className="relative z-10">
             <h2 className="font-display text-[40px] text-white mb-lg">Ready to get started?</h2>
             <p className="text-white/80 font-body-lg mb-xl max-w-[512px] mx-auto">Join thousands of organizers creating unforgettable experiences with Eventnic.</p>
-            <Link to="/signup" className="inline-block bg-white text-primary font-bold font-headline-sm px-[40px] py-[16px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all">
+            <Link to="/signup" className="inline-block bg-surface text-primary font-bold font-headline-sm px-[40px] py-[16px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all">
               Create Free Account
             </Link>
           </div>

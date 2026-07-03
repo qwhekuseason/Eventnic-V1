@@ -5,24 +5,50 @@ import { useEvents } from '../contexts/EventsContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '../config/firebase';
 
-const money = (n) => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = (n) => 'GH₵ ' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function CheckoutEventnic() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { getEvent, recordPurchase } = useEvents();
-  const [qty, setQty] = useState(1);
+  const { getEvent, recordPurchase, castVote } = useEvents();
+  
+  const type = params.get('type') || 'ticket';
+  const isVote = type === 'vote';
+  const categoryId = params.get('category');
+  const nomineeId = params.get('nominee');
+
+  const [qty, setQty] = useState(Number(params.get('qty')) || 1);
+  const [buyerName, setBuyerName] = useState('');
+  const [buyerEmail, setBuyerEmail] = useState('');
+  const [buyerPhone, setBuyerPhone] = useState('');
+  const [attendeeNames, setAttendeeNames] = useState<string[]>(['']);
+
+  // Keep attendeeNames length in sync with qty
+  useEffect(() => {
+    setAttendeeNames((prev) => {
+      if (prev.length === qty) return prev;
+      const newNames = [...prev];
+      if (newNames.length < qty) {
+        while (newNames.length < qty) newNames.push('');
+      } else {
+        newNames.length = qty;
+      }
+      return newNames;
+    });
+  }, [qty]);
 
   const event = params.get('event') ? getEvent(params.get('event')) : null;
-  const tier = event ? event.ticketTiers.find((t) => t.id === params.get('tier')) : null;
+  const tier = !isVote && event ? event.ticketTiers.find((t) => t.id === params.get('tier')) : null;
+  const category = isVote && event ? event.votingCategories?.find(c => c.id === categoryId) : null;
+  const nominee = category ? category.nominees.find(n => n.id === nomineeId) : null;
 
   const [platformSettings, setPlatformSettings] = useState({ deductionFeePercent: 5, baseVotePrice: 0 });
   const [paystackLoaded, setPaystackLoaded] = useState(false);
   const [paystackError, setPaystackError] = useState('');
   const db = getFirestore(app);
 
-  const unit = tier ? Number(tier.price) : 0;
-  const remaining = tier ? Math.max(0, tier.quantity - tier.sold) : 0;
+  const unit = isVote ? (event ? event.votePrice : 0) : (tier ? Number(tier.price) : 0);
+  const remaining = isVote ? Infinity : (tier ? Math.max(0, tier.quantity - tier.sold) : 0);
   const subtotal = unit * qty;
   const serviceFee = Math.round(subtotal * (platformSettings.deductionFeePercent / 100) * 100) / 100;
   const total = subtotal + serviceFee;
@@ -65,38 +91,58 @@ export default function CheckoutEventnic() {
   }, []);
 
   const completePurchase = async () => {
-    if (event && tier) {
-      await recordPurchase(event.id, tier.id, qty);
-      alert('Success! Confirmation email sent with your ticket numbers.');
+    if (isVote) {
+      if (event && categoryId && nomineeId) {
+        await castVote(event.id, categoryId, nomineeId, qty);
+        alert('Success! Your vote has been recorded.');
+      }
+    } else {
+      if (event && tier) {
+        await recordPurchase(event.id, tier.id, qty, attendeeNames);
+        alert('Success! Confirmation email sent with your ticket numbers.');
+      }
     }
     navigate('/payment-success');
   };
 
   const payWithPaystack = async () => {
-    if (!event || !tier) return;
+    if (isVote && (!event || !nominee)) return;
+    if (!isVote && (!event || !tier)) return;
     if (!window.PaystackPop) {
       setPaystackError('Paystack is not available. Please try again later.');
       return;
     }
 
-    const email = 'guest@eventnic.com';
+    const email = buyerEmail || 'guest@eventnic.com';
     const handler = window.PaystackPop.setup({
       key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxx',
       email,
       amount: Math.round(total * 100),
-      currency: 'NGN',
+      currency: 'GHS',
+      channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
       ref: `eventnic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       metadata: {
-        custom_fields: [
-          { display_name: 'Event title', variable_name: 'event_title', value: event.title },
-          { display_name: 'Ticket tier', variable_name: 'tier_name', value: tier.name },
+        custom_fields: isVote ? [
+          { display_name: 'Event title', variable_name: 'event_title', value: event?.title },
+          { display_name: 'Vote Category', variable_name: 'category_name', value: category?.name },
+          { display_name: 'Nominee', variable_name: 'nominee_name', value: nominee?.name },
+        ] : [
+          { display_name: 'Event title', variable_name: 'event_title', value: event?.title },
+          { display_name: 'Ticket tier', variable_name: 'tier_name', value: tier?.name },
         ],
       },
-      callback: async () => {
-        await recordPurchase(event.id, tier.id, qty);
-        navigate('/payment-success');
+      callback: function(response) {
+        if (isVote) {
+          castVote(event!.id, categoryId!, nomineeId!, qty).then(() => {
+            navigate('/payment-success');
+          });
+        } else {
+          recordPurchase(event!.id, tier!.id, qty, attendeeNames).then(() => {
+            navigate('/payment-success');
+          });
+        }
       },
-      onClose: () => {
+      onClose: function() {
         alert('Payment cancelled.');
       },
     });
@@ -136,40 +182,53 @@ export default function CheckoutEventnic() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
               <div className="md:col-span-2">
                 <label className="block font-label-md text-label-md text-on-surface-variant mb-xs" htmlFor="full-name">Full Name</label>
-                <input className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" id="full-name" placeholder="Enter your full name" type="text" />
+                <input value={buyerName} onChange={(e) => setBuyerName(e.target.value)} className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" id="full-name" placeholder="Enter your full name" type="text" />
               </div>
               <div>
                 <label className="block font-label-md text-label-md text-on-surface-variant mb-xs" htmlFor="email">Email Address</label>
-                <input className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" id="email" placeholder="you@example.com" type="email" />
+                <input value={buyerEmail} onChange={(e) => setBuyerEmail(e.target.value)} className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" id="email" placeholder="you@example.com" type="email" />
               </div>
               <div>
                 <label className="block font-label-md text-label-md text-on-surface-variant mb-xs" htmlFor="phone">Phone Number</label>
-                <input className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" id="phone" placeholder="+1 (555) 000-0000" type="tel" />
+                <input value={buyerPhone} onChange={(e) => setBuyerPhone(e.target.value)} className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" id="phone" placeholder="+1 (555) 000-0000" type="tel" />
               </div>
             </div>
           </section>
 
           <section className="bg-surface-container-lowest p-xl rounded-xl border border-surface-container-high shadow-sm">
             <div className="flex items-center gap-sm mb-lg">
-              <span className="material-symbols-outlined text-primary">group</span>
-              <h2 className="font-headline-sm text-headline-sm">Attendee Details</h2>
+              <span className="material-symbols-outlined text-primary">{isVote ? 'how_to_vote' : 'group'}</span>
+              <h2 className="font-headline-sm text-headline-sm">{isVote ? 'Voting Details' : 'Attendee Details'}</h2>
             </div>
             <div className="mb-md">
-              <h3 className="font-label-md text-label-md text-primary mb-md">{tier ? `${tier.name}` : 'Ticket'}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <div>
-                  <label className="block font-label-md text-label-md text-on-surface-variant mb-xs">First Name</label>
-                  <input className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" placeholder="First Name" type="text" />
+              <h3 className="font-label-md text-label-md text-primary mb-md">{isVote ? `Vote for ${nominee?.name}` : (tier ? `${tier.name}` : 'Ticket')}</h3>
+              {!isVote && (
+                <div className="space-y-md">
+                  {Array.from({ length: qty }).map((_, i) => (
+                    <div key={i} className="bg-surface p-md rounded-lg border border-outline-variant">
+                      <label className="block font-label-md text-label-md text-on-surface-variant mb-xs">
+                        Attendee {i + 1} Full Name
+                      </label>
+                      <input 
+                        value={attendeeNames[i] || ''}
+                        onChange={(e) => {
+                          const newNames = [...attendeeNames];
+                          newNames[i] = e.target.value;
+                          setAttendeeNames(newNames);
+                        }}
+                        className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" 
+                        placeholder={`Name for Ticket ${i + 1}`} 
+                        type="text" 
+                        required
+                      />
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <label className="block font-label-md text-label-md text-on-surface-variant mb-xs">Last Name</label>
-                  <input className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" placeholder="Last Name" type="text" />
-                </div>
-              </div>
+              )}
             </div>
             <div className="mt-lg p-md bg-secondary-container rounded-lg flex items-center gap-md">
               <span className="material-symbols-outlined text-on-secondary-container">info</span>
-              <p className="font-body-sm text-body-sm text-on-secondary-container">Tickets will be sent to the primary email address provided above.</p>
+              <p className="font-body-sm text-body-sm text-on-secondary-container">{isVote ? 'A confirmation email will be sent to the address provided above.' : 'Tickets will be sent to the primary email address provided above.'}</p>
             </div>
           </section>
         </div>
@@ -180,9 +239,9 @@ export default function CheckoutEventnic() {
               <h2 className="font-headline-sm text-headline-sm">Order Summary</h2>
             </div>
             <div className="p-lg space-y-md">
-              {!event || !tier ? (
+              {!event || (!isVote && !tier) || (isVote && !nominee) ? (
                 <div className="text-center py-lg">
-                  <p className="text-secondary font-body-md mb-md">No ticket selected.</p>
+                  <p className="text-secondary font-body-md mb-md">No item selected.</p>
                   <Link to="/explore" className="text-primary font-bold">Browse events</Link>
                 </div>
               ) : (
@@ -199,14 +258,14 @@ export default function CheckoutEventnic() {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="font-label-md text-on-surface">{tier.name}</span>
+                    <span className="font-label-md text-on-surface">{isVote ? `Vote: ${nominee.name}` : tier?.name}</span>
                     <div className="flex items-center gap-sm">
                       <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="w-7 h-7 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container"><span className="material-symbols-outlined text-[16px]">remove</span></button>
                       <span className="font-bold w-6 text-center">{qty}</span>
                       <button onClick={() => setQty((q) => Math.min(remaining || 1, q + 1))} className="w-7 h-7 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container"><span className="material-symbols-outlined text-[16px]">add</span></button>
                     </div>
                   </div>
-                  <p className="font-body-sm text-secondary">{remaining.toLocaleString()} remaining</p>
+                  {!isVote && <p className="font-body-sm text-secondary">{remaining.toLocaleString()} remaining</p>}
 
                   <div className="h-[1px] bg-outline-variant my-md"></div>
                   <div className="space-y-sm">
@@ -221,16 +280,24 @@ export default function CheckoutEventnic() {
                 </>
               )}
 
-              {paystackError && <div className="text-red-600 text-sm mt-md">{paystackError}</div>}
+              {paystackError && <div className="text-error text-sm mt-md">{paystackError}</div>}
+              
+              {!buyerName || !buyerEmail || (!isVote && attendeeNames.some(n => !n.trim())) ? (
+                 <div className="text-secondary text-sm mt-md text-center">Please fill out all required name and email fields.</div>
+              ) : null}
 
-              <button onClick={payWithPaystack} disabled={!event || !tier || !paystackLoaded} className={`w-full py-md rounded-lg font-bold font-body-lg text-body-lg mt-lg shadow-md transition-all flex items-center justify-center gap-md ${!event || !tier || !paystackLoaded ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : 'bg-secondary text-on-secondary hover:brightness-110 active:scale-[0.98]'}`}>
-                Pay with Paystack
-                <span className="material-symbols-outlined">payment</span>
-              </button>
-              <button onClick={completePurchase} disabled={!event || !tier} className={`w-full py-md rounded-lg font-bold font-body-lg text-body-lg mt-md shadow-md transition-all flex items-center justify-center gap-md ${!event || !tier ? 'bg-surface-container-high text-on-surface-variant cursor-not-allowed' : 'bg-primary text-on-primary hover:brightness-110 active:scale-[0.98]'}`}>
-                Complete Purchase
-                <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
+              {total > 0 && (
+                <button onClick={payWithPaystack} disabled={(!event || (!isVote && !tier) || (isVote && !nominee)) || !paystackLoaded || !buyerName || !buyerEmail || (!isVote && attendeeNames.some(n => !n.trim()))} className="btn-secondary w-full py-md mt-lg">
+                  Pay with Paystack (Card / USSD)
+                  <span className="material-symbols-outlined">payment</span>
+                </button>
+              )}
+              {total === 0 && (
+                <button onClick={completePurchase} disabled={(!event || (!isVote && !tier) || (isVote && !nominee)) || !buyerName || !buyerEmail || (!isVote && attendeeNames.some(n => !n.trim()))} className="btn-primary w-full py-md mt-md">
+                  Complete {isVote ? 'Vote' : 'Purchase'} (Free)
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+              )}
             </div>
             <p className="p-lg pt-0 text-center font-body-sm text-body-sm text-on-surface-variant">
               By completing your purchase, you agree to Eventnic's <Link className="text-primary underline" to="/terms-of-service">Terms of Service</Link> and <Link className="text-primary underline" to="/privacy-policy">Privacy Policy</Link>.

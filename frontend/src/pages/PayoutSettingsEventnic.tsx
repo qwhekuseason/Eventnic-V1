@@ -10,7 +10,7 @@ const defaultSettings = {
   baseVotePrice: 50,
 };
 
-const formatCurrency = (value) => `NGN ${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatCurrency = (value) => `GH₵ ${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function PayoutSettingsEventnic() {
   const { user, login } = useAuth();
@@ -398,7 +398,7 @@ export default function PayoutSettingsEventnic() {
                               {request.status === 'PENDING' ? (
                                 <>
                                   <button onClick={() => updateRequestStatus(request.id, 'APPROVED')} className="text-emerald-600 hover:text-emerald-900 font-semibold">Approve</button>
-                                  <button onClick={() => updateRequestStatus(request.id, 'REJECTED')} className="text-red-600 hover:text-red-900 font-semibold">Reject</button>
+                                  <button onClick={() => updateRequestStatus(request.id, 'REJECTED')} className="text-error hover:text-red-900 font-semibold">Reject</button>
                                 </>
                               ) : (
                                 <span className="text-secondary">No action</span>

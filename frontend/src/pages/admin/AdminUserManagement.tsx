@@ -81,7 +81,7 @@ export default function AdminUserManagement() {
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-[10px] rounded-xl border border-outline-variant bg-white text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-[10px] rounded-xl border border-outline-variant bg-surface text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
           </div>
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className="bg-surface border border-outline-variant rounded-full px-lg py-xs text-on-surface font-body-sm focus:outline-none focus:border-primary">
@@ -121,12 +121,12 @@ export default function AdminUserManagement() {
                       </div>
                     </td>
                     <td className="px-lg py-md">
-                      <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold ${u.role === 'ORGANIZER' ? 'bg-blue-100 text-blue-700 border border-blue-200' : u.role === 'ADMIN' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-purple-100 text-purple-700 border border-purple-200'}`}>
+                      <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold ${u.role === 'ORGANIZER' ? 'bg-blue-100 text-primary border border-primary/30' : u.role === 'ADMIN' ? 'bg-amber-100 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 'bg-purple-100 text-purple-700 border border-purple-200'}`}>
                         {u.role || 'VOTER'}
                       </span>
                     </td>
                     <td className="px-lg py-md">
-                      <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold ${(!u.status || u.status === 'active') ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-red-100 text-red-700 border border-red-200'}`}>
+                      <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold ${(!u.status || u.status === 'active') ? 'bg-green-100 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-red-100 text-on-error-container border border-error/30'}`}>
                         {u.status || 'active'}
                       </span>
                     </td>
@@ -153,8 +153,8 @@ export default function AdminUserManagement() {
                       <div className="flex items-center justify-end gap-xs">
                         {u.role === 'ORGANIZER' && u.verificationStatus === 'PENDING' && (
                           <>
-                            <button onClick={() => updateVerification(u, 'VERIFIED')} className="text-emerald-600 hover:text-emerald-900 bg-emerald-50 px-3 py-1 rounded-full font-label-md transition-colors">Approve</button>
-                            <button onClick={() => updateVerification(u, 'REJECTED')} className="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-full font-label-md transition-colors">Reject</button>
+                            <button onClick={() => updateVerification(u, 'VERIFIED')} className="text-emerald-600 hover:text-emerald-900 bg-emerald-500/10 px-3 py-1 rounded-full font-label-md transition-colors">Approve</button>
+                            <button onClick={() => updateVerification(u, 'REJECTED')} className="text-error hover:text-red-900 bg-error-container px-3 py-1 rounded-full font-label-md transition-colors">Reject</button>
                           </>
                         )}
                         <button onClick={() => toggleStatus(u)} className={`${u.status === 'suspended' ? 'text-emerald-600 hover:text-emerald-900' : 'text-error hover:text-red-900'} font-label-md ml-4 transition-colors`}>

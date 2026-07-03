@@ -3,12 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { memo, useState, useEffect, useRef } from 'react';
 import Logo from './Logo';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = memo(function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
+  const { theme, setTheme, isDark } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -49,6 +51,10 @@ const Header = memo(function Header() {
     navigate('/');
   };
 
+  const toggleTheme = () => {
+    setTheme(isDark ? 'light' : 'dark');
+  };
+
   const navLinks = [
     { name: 'Explore', path: '/explore' },
     { name: 'About', path: '/about' },
@@ -56,8 +62,12 @@ const Header = memo(function Header() {
   ];
 
   return (
-    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? 'py-sm' : 'py-md px-margin'}`}>
-      <div className={`mx-auto flex justify-between items-center transition-all duration-300 ${isScrolled ? 'glass-panel bg-primary/90 w-full px-margin h-[64px]' : 'glass-panel max-w-container-max rounded-full px-lg h-[72px]'}`}>
+    <header className={`fixed w-full top-0 z-50 transition-all duration-300 ${isScrolled ? '' : 'py-md px-margin'}`}>
+      <div className={`mx-auto flex justify-between items-center transition-all duration-300 ${
+        isScrolled
+          ? 'w-full px-margin h-[64px] bg-[#140d23]/95 backdrop-blur-md border-b border-white/10 shadow-lg'
+          : 'max-w-container-max rounded-2xl px-lg h-[72px] bg-[#140d23]/80 backdrop-blur-md border border-white/10 shadow-xl'
+      }`}>
         <div className="flex items-center gap-xl">
           <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
             <Logo variant="white" />
@@ -78,6 +88,16 @@ const Header = memo(function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-md">
+          <button 
+            onClick={toggleTheme} 
+            className="p-xs text-white/90 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center mr-2"
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <span className="material-symbols-outlined text-[24px]">
+              {isDark ? 'light_mode' : 'dark_mode'}
+            </span>
+          </button>
+          
           {isAuthenticated ? (
             <div className="relative" ref={userMenuRef}>
               <button 
@@ -127,7 +147,7 @@ const Header = memo(function Header() {
               <Link to="/login" className="px-md py-sm text-white/90 font-medium font-label-md hover:text-tertiary transition-colors duration-200">
                 Log in
               </Link>
-              <Link to="/signup" className="px-lg py-[10px] bg-gradient-premium text-white rounded-full font-bold font-label-md shadow-lg hover:shadow-xl hover:scale-105 active:scale-[0.99] transition-all">
+              <Link to="/signup" className="px-lg py-[10px] bg-primary text-white rounded-full font-bold font-label-md shadow-lg hover:shadow-xl hover:scale-105 active:scale-[0.99] transition-all">
                 Sign Up
               </Link>
             </>
@@ -167,6 +187,15 @@ const Header = memo(function Header() {
               )}
 
               <nav className="flex flex-col gap-sm">
+                <button 
+                  onClick={toggleTheme}
+                  className="flex items-center gap-sm p-md font-headline-sm font-bold text-on-surface hover:bg-surface-container-high rounded-xl transition-colors text-left"
+                >
+                  <span className="material-symbols-outlined">
+                    {isDark ? 'light_mode' : 'dark_mode'}
+                  </span>
+                  {isDark ? 'Light Mode' : 'Dark Mode'}
+                </button>
                 {navLinks.map((link) => (
                   <Link 
                     key={link.name} 

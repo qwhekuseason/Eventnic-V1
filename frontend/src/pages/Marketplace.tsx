@@ -60,12 +60,12 @@ export default function Marketplace() {
           ) : (
             filteredListings.map(listing => (
               <div key={listing.id} className="bg-surface border border-outline-variant rounded-2xl overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all flex flex-col">
-                <div className="h-48 bg-gradient-dark relative flex items-center justify-center">
+                <div className="h-48 hero-section relative flex items-center justify-center">
                    <span className="material-symbols-outlined text-[64px] text-white/50">
                     {listing.category === 'venue' ? 'domain' : listing.category === 'photography' ? 'camera_alt' : listing.category === 'catering' ? 'restaurant' : listing.category === 'mc' ? 'mic' : 'star'}
                    </span>
                    <div className="absolute top-md right-md bg-white/90 backdrop-blur text-on-surface px-sm py-xs rounded-lg font-bold text-sm">
-                     ${listing.price.toLocaleString()}
+                     GH₵ {listing.price.toLocaleString()}
                    </div>
                 </div>
                 <div className="p-lg flex flex-col flex-1">

@@ -8,7 +8,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { EventsProvider } from './contexts/EventsContext';
 import { MarketplaceProvider } from './contexts/MarketplaceContext';
 import { NominationsProvider } from './contexts/NominationsContext';
-
+import { ThemeProvider } from './contexts/ThemeContext';
 // Loading fallback component
 function LoadingFallback() {
   return (
@@ -33,6 +33,7 @@ const CreateEventBasicInfoEventnic = lazy(() => import('./pages/CreateEventBasic
 const CreateEventReviewEventnic = lazy(() => import('./pages/CreateEventReviewEventnic'));
 const CreateEventScheduleEventnic = lazy(() => import('./pages/CreateEventScheduleEventnic'));
 const CreateEventTicketsEventnic = lazy(() => import('./pages/CreateEventTicketsEventnic'));
+const EditEventEventnic = lazy(() => import('./pages/EditEventEventnic'));
 const EventnicEventManagementPlatform = lazy(() => import('./pages/EventnicEventManagementPlatform'));
 const EventOverviewAnalyticsEventnic = lazy(() => import('./pages/EventOverviewAnalyticsEventnic'));
 const ExploreEventsEventnic = lazy(() => import('./pages/ExploreEventsEventnic'));
@@ -50,7 +51,9 @@ const PrivacyPolicyEventnic = lazy(() => import('./pages/PrivacyPolicyEventnic')
 const RefundPolicyEventnic = lazy(() => import('./pages/RefundPolicyEventnic'));
 const PaymentFailedEventnic = lazy(() => import('./pages/PaymentFailedEventnic'));
 const TicketLookupEventnic = lazy(() => import('./pages/TicketLookupEventnic'));
-const PublicEventPageTechpulseGlobal2024 = lazy(() => import('./pages/PublicEventPageTechpulseGlobal2024'));
+const PublicEventPage = lazy(() => import('./pages/PublicEventPage'));
+const PublicVotingPage = lazy(() => import('./pages/PublicVotingPage'));
+const PublicNomineeVotingPage = lazy(() => import('./pages/PublicNomineeVotingPage'));
 const SignupEventnic = lazy(() => import('./pages/SignupEventnic'));
 const SignupVerificationEventnic = lazy(() => import('./pages/SignupVerificationEventnic'));
 const TermsOfServiceEventnic = lazy(() => import('./pages/TermsOfServiceEventnic'));
@@ -92,7 +95,9 @@ function Layout() {
             <Route path="/signup" element={<SignupEventnic />} />
             <Route path="/signup/verification" element={<SignupVerificationEventnic />} />
             <Route path="/forgot-password" element={<ForgotPasswordEventnic />} />
-            <Route path="/event/:slug" element={<PublicEventPageTechpulseGlobal2024 />} />
+            <Route path="/event/:slug" element={<PublicEventPage />} />
+            <Route path="/event/:slug/vote" element={<PublicVotingPage />} />
+            <Route path="/event/:slug/vote/:categoryId/:nomineeId" element={<PublicNomineeVotingPage />} />
             <Route path="/payment-success" element={<PaymentSuccessfulEventnic />} />
             <Route path="/payment-failed" element={<PaymentFailedEventnic />} />
             <Route path="/ticket-lookup" element={<TicketLookupEventnic />} />
@@ -117,6 +122,7 @@ function Layout() {
             <Route path="/create-event/schedule" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><CreateEventScheduleEventnic /></ProtectedRoute>} />
             <Route path="/create-event/review" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><CreateEventReviewEventnic /></ProtectedRoute>} />
             <Route path="/event-analytics" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><EventOverviewAnalyticsEventnic /></ProtectedRoute>} />
+            <Route path="/event/:slug/edit" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><EditEventEventnic /></ProtectedRoute>} />
             <Route path="/event-attendees" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><AttendeeListOrdersEventnic /></ProtectedRoute>} />
             <Route path="/payout-settings" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><PayoutSettingsEventnic /></ProtectedRoute>} />
             <Route path="/organizer/broadcasts" element={<ProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}><OrganizerEmailBroadcasts /></ProtectedRoute>} />
@@ -149,16 +155,18 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <EventsProvider>
-          <MarketplaceProvider>
-            <NominationsProvider>
-              <Layout />
-            </NominationsProvider>
-          </MarketplaceProvider>
-        </EventsProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <EventsProvider>
+            <MarketplaceProvider>
+              <NominationsProvider>
+                <Layout />
+              </NominationsProvider>
+            </MarketplaceProvider>
+          </EventsProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

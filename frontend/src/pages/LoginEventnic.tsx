@@ -94,8 +94,8 @@ export default function LoginEventnic() {
 
           <div className="mt-8">
             {error && (
-              <div className="mb-4 rounded-lg bg-red-50 p-4 border border-red-200">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="mb-4 rounded-lg bg-error-container p-4 border border-error/30">
+                <p className="text-sm text-on-error-container">{error}</p>
               </div>
             )}
             <form className="space-y-5" onSubmit={handleSubmit}>
@@ -136,7 +136,7 @@ export default function LoginEventnic() {
       </div>
 
       {/* Right side - Image */}
-      <div className="relative hidden w-0 flex-1 lg:block bg-gradient-dark overflow-hidden">
+      <div className="relative hidden w-0 flex-1 lg:block hero-section overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/stitch-9bf3cc8257fe8d98.png')] bg-cover bg-center mix-blend-overlay opacity-40"></div>
         
         <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-tertiary/20 blur-[80px]"></div>

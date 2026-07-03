@@ -22,6 +22,12 @@ pnpm-debug.log*
 .env.local
 .env.*.local
 
+# Firebase service account keys (SENSITIVE - never commit)
+*-firebase-adminsdk-*.json
+
+# Scratch/temp files
+search_results.txt
+
 # Editor directories
 .vscode/
 .idea/

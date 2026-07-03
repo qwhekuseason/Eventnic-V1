@@ -5,7 +5,7 @@ export default function PrivacyPolicyEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero */}
-      <section className="relative pt-[160px] pb-[60px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[60px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] right-[20%] w-[500px] h-[500px] rounded-full bg-tertiary/15 blur-[120px]" />
         </div>
@@ -21,7 +21,7 @@ export default function PrivacyPolicyEventnic() {
         <div className="max-w-3xl mx-auto px-margin">
           <article className="prose max-w-none space-y-xl text-on-surface">
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">1. Information We Collect</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>We collect information you provide directly to us when you create an account, purchase tickets, organize events, or contact our support team. This includes:</p>
@@ -35,7 +35,7 @@ export default function PrivacyPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">2. How We Use Your Information</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>We use the information we collect to:</p>
@@ -51,7 +51,7 @@ export default function PrivacyPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">3. Information Sharing</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>We do not sell your personal information. We may share your information with:</p>
@@ -63,14 +63,14 @@ export default function PrivacyPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">4. Data Security</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>We implement industry-standard security measures including encryption in transit (TLS 1.3), encryption at rest (AES-256), and regular security audits. Payment information is processed by PCI DSS-compliant providers and never stored on our servers.</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">5. Your Rights</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>Depending on your location, you may have rights including:</p>
@@ -85,14 +85,14 @@ export default function PrivacyPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">6. Cookies</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>We use essential cookies for platform functionality and optional cookies for analytics and personalization. You can manage your cookie preferences through your browser settings at any time.</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">7. Contact Us</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>If you have questions about this Privacy Policy, please contact us at:</p>

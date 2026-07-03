@@ -4,14 +4,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useEvents, eventSold, eventCapacity, eventSoldPct } from '../contexts/EventsContext';
 import { motion } from 'framer-motion';
 
-const money = (n) => '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money = (n: number) => 'GH₵ ' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function StatusBadge({ event }) {
-  if (event.status === 'pending') return <span className="px-sm py-xs rounded-full bg-amber-100 text-amber-700 font-label-sm text-label-sm border border-amber-200 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pending</span>;
+  if (event.status === 'pending') return <span className="px-sm py-xs rounded-full bg-amber-100 text-amber-600 dark:text-amber-400 font-label-sm text-label-sm border border-amber-500/30 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pending</span>;
   if (event.status === 'draft') return <span className="px-sm py-xs rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm border border-outline-variant flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-outline"></span> Draft</span>;
-  if (event.status === 'rejected') return <span className="px-sm py-xs rounded-full bg-red-100 text-red-700 font-label-sm text-label-sm border border-red-200 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-red-500"></span> Rejected</span>;
+  if (event.status === 'rejected') return <span className="px-sm py-xs rounded-full bg-red-100 text-on-error-container font-label-sm text-label-sm border border-error/30 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-red-500"></span> Rejected</span>;
   const pct = eventSoldPct(event);
-  if (pct >= 90) return <span className="px-sm py-xs rounded-full bg-red-100 text-red-700 font-label-sm text-label-sm border border-red-200 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span> Selling Fast</span>;
+  if (pct >= 90) return <span className="px-sm py-xs rounded-full bg-red-100 text-on-error-container font-label-sm text-label-sm border border-error/30 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span> Selling Fast</span>;
   return <span className="px-sm py-xs rounded-full bg-emerald-100 text-emerald-700 font-label-sm text-label-sm border border-emerald-200 flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> On Sale</span>;
 }
 
@@ -31,8 +31,8 @@ export default function OrganizerDashboardEventnic() {
       {/* Welcome Banner */}
       <div className="max-w-container-max mx-auto px-margin mb-xl">
         {isSuspended && (
-          <div className="mb-lg p-md bg-red-50 border border-red-200 rounded-xl flex items-start gap-md">
-            <span className="material-symbols-outlined text-red-600 mt-1">block</span>
+          <div className="mb-lg p-md bg-error-container border border-error/30 rounded-xl flex items-start gap-md">
+            <span className="material-symbols-outlined text-error mt-1">block</span>
             <div>
               <h3 className="font-display text-lg text-red-900">Account Suspended</h3>
               <p className="text-red-800 font-body-sm mt-1">Your account has been suspended. Contact support or platform administration to restore access.</p>
@@ -40,7 +40,7 @@ export default function OrganizerDashboardEventnic() {
           </div>
         )}
         {isPending && !isSuspended && (
-          <div className="mb-lg p-md bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-md">
+          <div className="mb-lg p-md bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-md">
             <span className="material-symbols-outlined text-amber-600 mt-1">pending_actions</span>
             <div>
               <h3 className="font-display text-lg text-amber-900">Verification Pending</h3>
@@ -68,7 +68,7 @@ export default function OrganizerDashboardEventnic() {
               <button onClick={() => navigate('/settings/payout')} className="flex items-center justify-center gap-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white px-md h-[48px] rounded-xl font-bold transition-all hover:shadow-md backdrop-blur-md">
                 <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span> Payout Settings
               </button>
-              <button onClick={() => navigate('/create-event/basic-info')} disabled={isPending || isSuspended} className="flex items-center justify-center gap-xs bg-white text-primary hover:bg-surface-container-lowest px-lg h-[48px] rounded-xl font-bold shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+              <button onClick={() => navigate('/create-event/basic-info')} disabled={isPending || isSuspended} className="flex items-center justify-center gap-xs bg-surface text-primary hover:bg-surface-container-lowest px-lg h-[48px] rounded-xl font-bold shadow-md hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span className="material-symbols-outlined text-[20px]">add</span> Create Event
               </button>
             </div>

@@ -18,10 +18,10 @@ export default function PaymentFailedEventnic() {
         transition={{ duration: 0.5 }}
         className="relative z-10 w-full max-w-[512px] mx-auto px-md"
       >
-        <div className="bg-white rounded-[24px] border border-outline-variant shadow-xl p-xl md:p-xxl text-center">
+        <div className="bg-surface rounded-[24px] border border-outline-variant shadow-xl p-xl md:p-xxl text-center">
           
-          <div className="w-24 h-24 rounded-full bg-red-50 border-4 border-red-100 flex items-center justify-center mx-auto mb-lg">
-            <span className="material-symbols-outlined text-red-500 text-[48px]">error</span>
+          <div className="w-24 h-24 rounded-full bg-error-container border-4 border-red-100 flex items-center justify-center mx-auto mb-lg">
+            <span className="material-symbols-outlined text-error text-[48px]">error</span>
           </div>
           
           <h1 className="font-display text-[32px] text-on-surface mb-sm">Payment Failed</h1>

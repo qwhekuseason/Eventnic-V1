@@ -39,12 +39,14 @@ export default function CreateEventBasicInfoEventnic() {
   const updateCategory = (id, name) =>
     set({ votingCategories: draft.votingCategories.map((c) => (c.id === id ? { ...c, name } : c)) });
   const removeCategory = (id) => set({ votingCategories: draft.votingCategories.filter((c) => c.id !== id) });
-  const addNominee = (catId) =>
-    set({
-      votingCategories: draft.votingCategories.map((c) =>
-        c.id === catId ? { ...c, nominees: [...c.nominees, { id: uid(), name: '', description: '', votes: 0, imageUrl: '' }] } : c,
-      ),
-    });
+  const addNominee = (catId) => {
+    const categories = [...draft.votingCategories];
+    const cat = categories.find((c) => c.id === catId);
+    if (cat) {
+      cat.nominees.push({ id: uid(), name: '', description: '', email: '', votes: 0, imageUrl: '' });
+      set({ votingCategories: categories });
+    }
+  };
   const updateNominee = (catId, nomId, field, value) =>
     set({
       votingCategories: draft.votingCategories.map((c) =>
@@ -63,6 +65,14 @@ export default function CreateEventBasicInfoEventnic() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => set({ coverImage: reader.result });
+    reader.readAsDataURL(file);
+  };
+
+  const onNomineeImageUpload = (e, catId, nomId) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => updateNominee(catId, nomId, 'imageUrl', reader.result);
     reader.readAsDataURL(file);
   };
 
@@ -105,7 +115,7 @@ export default function CreateEventBasicInfoEventnic() {
                 list="event-type-list"
                 value={draft.category}
                 onChange={(e) => set({ category: e.target.value })}
-                className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md bg-white"
+                className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md bg-surface"
                 placeholder="Select or type your event type"
                 type="text"
               />
@@ -120,7 +130,7 @@ export default function CreateEventBasicInfoEventnic() {
 
             <div className="space-y-xs">
               <label className="font-label-md text-label-md text-on-surface">Location Type</label>
-              <select value={draft.locationType} onChange={(e) => set({ locationType: e.target.value })} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md appearance-none bg-white">
+              <select value={draft.locationType} onChange={(e) => set({ locationType: e.target.value })} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md appearance-none bg-surface">
                 <option value="physical">Physical Venue</option>
                 <option value="online">Online / Virtual</option>
                 <option value="hybrid">Hybrid</option>
@@ -201,7 +211,7 @@ export default function CreateEventBasicInfoEventnic() {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer shrink-0 ml-sm">
                   <input type="checkbox" className="sr-only peer" checked={draft.votingEnabled} onChange={toggleVoting} />
-                  <div className="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div className="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
 
@@ -231,10 +241,16 @@ export default function CreateEventBasicInfoEventnic() {
                       <div className="space-y-sm pl-md border-l-2 border-outline-variant">
                         {cat.nominees.map((nom) => (
                           <div key={nom.id} className="space-y-sm bg-surface p-md rounded-xl">
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-md items-end">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-md items-end">
                               <input value={nom.name} onChange={(e) => updateNominee(cat.id, nom.id, 'name', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Nominee Name" type="text" />
+                              <input value={nom.email || ''} onChange={(e) => updateNominee(cat.id, nom.id, 'email', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Nominee Email" type="email" />
                               <input value={nom.description} onChange={(e) => updateNominee(cat.id, nom.id, 'description', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Short Description" type="text" />
-                              <input value={nom.imageUrl || ''} onChange={(e) => updateNominee(cat.id, nom.id, 'imageUrl', e.target.value)} className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm" placeholder="Nominee Image URL" type="url" />
+                              <label className="relative cursor-pointer w-full">
+                                <input type="file" accept="image/*" onChange={(e) => onNomineeImageUpload(e, cat.id, nom.id)} className="sr-only" />
+                                <div className="w-full h-10 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all text-body-sm flex items-center bg-surface text-secondary hover:bg-surface-container-highest whitespace-nowrap overflow-hidden text-ellipsis">
+                                  {nom.imageUrl ? 'Image Uploaded (Click to change)' : 'Upload Nominee Image'}
+                                </div>
+                              </label>
                             </div>
                             <div className="flex justify-end">
                               <button type="button" onClick={() => removeNominee(cat.id, nom.id)} className="text-secondary hover:text-error transition-colors p-sm self-end sm:self-auto">
@@ -258,8 +274,8 @@ export default function CreateEventBasicInfoEventnic() {
           </div>
 
           <div className="flex justify-end items-center gap-md pt-xl border-t border-outline-variant">
-            <button onClick={saveDraft} className="px-xl h-11 border border-outline-variant rounded-lg text-secondary font-label-md hover:bg-surface-container-low cursor-pointer transition-all" type="button">Save Draft</button>
-            <button onClick={() => navigate('/create-event/tickets')} className="px-xxl h-11 bg-primary text-on-primary rounded-lg font-label-md hover:opacity-90 shadow-md cursor-pointer transition-all active:scale-[0.98]" type="button">Continue</button>
+            <button onClick={saveDraft} className="btn-outline h-11" type="button">Save Draft</button>
+            <button onClick={() => navigate('/create-event/tickets')} className="btn-primary h-11 px-xxl" type="button">Continue</button>
           </div>
         </div>
       </div>

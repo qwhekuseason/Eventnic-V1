@@ -2,73 +2,92 @@
 /* Body/heading fonts are loaded via <link> in index.html to keep @import rules valid in the bundled CSS. */
 
 @theme {
-  --color-tertiary-fixed-dim: #bec6e0;
-  --color-primary-container: #5b44c4;
+  /* === Light mode tokens (defaults) === */
   --color-primary: #4834a4;
-  --color-surface-container-low: #f2f4f6;
-  --color-on-surface: #191c1e;
-  --color-outline: #777587;
-  --color-surface-container-highest: #e0e3e5;
-  --color-secondary-container: #e2dfff;
-  --color-primary-fixed: #e2dfff;
-  --color-secondary-fixed-dim: #b7c8e1;
-  --color-on-background: #191c1e;
-  --color-surface-variant: #e0e3e5;
-  --color-on-tertiary: #ffffff;
-  --color-inverse-primary: #c3c0ff;
-  --color-error-container: #ffdad6;
-  --color-on-primary-container: #ffffff;
   --color-on-primary: #ffffff;
-  --color-on-secondary-fixed-variant: #38485d;
-  --color-on-secondary-container: #54647a;
-  --color-outline-variant: #c7c4d8;
-  --color-on-tertiary-container: #ffffff;
-  --color-inverse-surface: #2d3133;
-  --color-secondary: #5b44c4;
-  --color-surface-dim: #d8dadc;
-  --color-on-error-container: #93000a;
-  --color-secondary-fixed: #d3e4fe;
-  --color-on-primary-fixed: #0f0069;
-  --color-surface-tint: #4834a4;
-  --color-on-secondary-fixed: #0b1c30;
-  --color-on-primary-fixed-variant: #3323cc;
-  --color-surface-container-lowest: #ffffff;
-  --color-on-tertiary-fixed-variant: #3f465c;
-  --color-background: #f7f9fb;
-  --color-surface-container-high: #e6e8ea;
-  --color-surface: #f7f9fb;
-  --color-on-surface-variant: #464555;
-  --color-on-secondary: #ffffff;
-  --color-on-error: #ffffff;
-  --color-inverse-on-surface: #eff1f3;
+  --color-primary-container: #5b44c4;
+  --color-on-primary-container: #ffffff;
+  --color-primary-fixed: #e2dfff;
   --color-primary-fixed-dim: #c3c0ff;
-  --color-surface-bright: #f7f9fb;
-  --color-surface-container: #eceef0;
-  --color-tertiary-container: #586076;
+  --color-on-primary-fixed: #0f0069;
+  --color-on-primary-fixed-variant: #3323cc;
+
+  --color-secondary: #5b44c4;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e2dfff;
+  --color-on-secondary-container: #54647a;
+  --color-secondary-fixed: #d3e4fe;
+  --color-secondary-fixed-dim: #b7c8e1;
+  --color-on-secondary-fixed: #0b1c30;
+  --color-on-secondary-fixed-variant: #38485d;
+
   --color-tertiary: #a997fa;
-  --color-error: #ba1a1a;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #586076;
+  --color-on-tertiary-container: #ffffff;
   --color-tertiary-fixed: #dae2fd;
+  --color-tertiary-fixed-dim: #bec6e0;
   --color-on-tertiary-fixed: #131b2e;
+  --color-on-tertiary-fixed-variant: #3f465c;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+
+  --color-surface: #f7f9fb;
+  --color-on-surface: #191c1e;
+  --color-surface-variant: #e0e3e5;
+  --color-on-surface-variant: #464555;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+
+  --color-outline: #777587;
+  --color-outline-variant: #c7c4d8;
+
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-inverse-primary: #c3c0ff;
+  --color-surface-tint: #4834a4;
+
+  /* === Spacing === */
+  --spacing-xs: 4px;
   --spacing-sm: 8px;
+  --spacing-md: 16px;
   --spacing-lg: 24px;
+  --spacing-xl: 32px;
   --spacing-xxl: 48px;
   --spacing-gutter: 24px;
-  --spacing-xl: 32px;
-  --spacing-md: 16px;
-  --spacing-margin: 24px;
   --spacing-base: 8px;
+  --spacing-margin: 24px;
   --spacing-container-max: 1280px;
-  --spacing-xs: 4px;
+
+  /* === Typography === */
+  --font-display: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
   --font-headline-lg: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
   --font-headline-lg-mobile: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
-  --font-label-sm: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
-  --font-display: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
   --font-headline-md: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
   --font-headline-sm: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-label-lg: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-label-md: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-label-sm: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-body-lg: "Inter", sans-serif;
   --font-body-md: "Inter", sans-serif;
   --font-body-sm: "Inter", sans-serif;
-  --font-body-lg: "Inter", sans-serif;
-  --font-label-md: "Fractul", "Outfit", "Plus Jakarta Sans", "Inter", sans-serif;
+
+  --text-display: 48px;
+  --text-display--line-height: 56px;
+  --text-display--font-weight: 800;
+  --text-display--letter-spacing: -0.02em;
+
   --text-headline-lg: 32px;
   --text-headline-lg--line-height: 40px;
   --text-headline-lg--font-weight: 700;
@@ -76,41 +95,63 @@
   --text-headline-lg-mobile: 24px;
   --text-headline-lg-mobile--line-height: 32px;
   --text-headline-lg-mobile--font-weight: 700;
-  --text-label-sm: 12px;
-  --text-label-sm--line-height: 16px;
-  --text-label-sm--font-weight: 500;
-  --text-display: 48px;
-  --text-display--line-height: 56px;
-  --text-display--font-weight: 800;
-  --text-display--letter-spacing: -0.02em;
+
   --text-headline-md: 24px;
   --text-headline-md--line-height: 32px;
   --text-headline-md--font-weight: 600;
+
   --text-headline-sm: 20px;
   --text-headline-sm--line-height: 28px;
   --text-headline-sm--font-weight: 600;
-  --text-body-md: 16px;
-  --text-body-md--line-height: 24px;
-  --text-body-md--font-weight: 400;
-  --text-body-sm: 14px;
-  --text-body-sm--line-height: 20px;
-  --text-body-sm--font-weight: 400;
+
   --text-body-lg: 18px;
   --text-body-lg--line-height: 28px;
   --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--font-weight: 400;
+
   --text-label-md: 14px;
   --text-label-md--line-height: 20px;
   --text-label-md--font-weight: 600;
   --text-label-md--letter-spacing: 0.05em;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 16px;
+  --text-label-sm--font-weight: 500;
+
   --radius: 0.25rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-full: 9999px;
 }
 
-body { font-family: 'Inter', sans-serif; }
+/* ============================================================
+   BASE
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+}
 
-/* Self-hosted Material Symbols (subset/pinned) so icons never depend on a CDN at runtime. */
+html, * {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   MATERIAL ICONS
+   ============================================================ */
 @font-face {
   font-family: 'Material Symbols Outlined';
   font-style: normal;
@@ -135,92 +176,206 @@ body { font-family: 'Inter', sans-serif; }
   -webkit-font-smoothing: antialiased;
   font-variation-settings: 'FILL' 0;
 }
-.text-gradient {
+
+/* ============================================================
+   HERO / DARK SECTION
+   Always dark regardless of theme — this is an intentionally
+   dark panel (e.g. hero, explore banner, login side panel).
+   ============================================================ */
+.hero-section {
+  background-color: #140d23;
+  color: #f8f6fc;
+}
+
+/* ============================================================
+   GLASS PANELS
+   ============================================================ */
+
+/* Glass for use INSIDE the hero/dark sections */
+.glass-panel-dark {
+  background: rgba(255, 255, 255, 0.07);
+  color: #f0f2f5;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Glass for use on light/surface backgrounds */
+.glass-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-outline-variant);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ============================================================
+   GRADIENT TEXT (stats, hero tagline accent)
+   ============================================================ */
+.text-gradient-premium {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-tertiary) 100%);
   -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.glass-panel {
-  background: rgba(72, 52, 164, 0.1);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-}
-
-.glass-panel-dark {
-  background: rgba(15, 10, 35, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(169, 151, 250, 0.2);
-  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.4);
-}
-
+/* bg version (for bg-clip text in TSX) */
 .bg-gradient-premium {
-  background-image: linear-gradient(135deg, #4834a4 0%, #5b44c4 50%, #a997fa 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-tertiary) 100%);
 }
 
-.bg-gradient-dark {
-  background-image: radial-gradient(circle at top right, #3323cc 0%, #0f0069 40%, #05001a 100%);
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+/* ============================================================
+   CARD HOVER
+   ============================================================ */
 .card-hover {
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-primary) !important;
 }
 
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+/* ============================================================
+   LEGACY ALIASES (kept for backward compat, now point to hero-section styles)
+   ============================================================ */
+.bg-gradient-dark {
+  background-color: #0d0f14;
+  color: #f0f2f5;
+}
+.text-gradient-animated,
+.text-gradient {
+  color: var(--color-primary);
+}
+.glow-primary, .glow-tertiary, .glow-emerald {
+  box-shadow: none;
+}
+.animate-shimmer {
+  background: var(--color-surface-container-high);
+}
+
+/* ============================================================
+   FORM INPUTS & BUTTONS — base
+   ============================================================ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+  @apply bg-surface px-md py-base border border-outline-variant rounded-xl text-body-md text-on-surface outline-none transition-all duration-200;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  @apply border-primary ring-2 ring-primary/20 bg-surface-container-lowest;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 0.6;
+}
+
+button {
+  @apply outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-primary text-on-primary hover:brightness-110 active:scale-[0.98] shadow-md px-lg py-base rounded-xl font-bold font-label-md flex items-center justify-center gap-sm disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-on-secondary hover:brightness-110 active:scale-[0.98] shadow-md px-lg py-base rounded-xl font-bold font-label-md flex items-center justify-center gap-sm disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-primary hover:bg-primary/10 active:scale-[0.98] px-lg py-base rounded-xl font-bold font-label-md flex items-center justify-center gap-sm disabled:text-on-surface-variant disabled:cursor-not-allowed disabled:active:scale-100;
+}
+
+.btn-outline {
+  @apply bg-transparent border border-outline-variant text-on-surface hover:border-primary hover:text-primary active:scale-[0.98] px-lg py-base rounded-xl font-bold font-label-md flex items-center justify-center gap-sm disabled:text-on-surface-variant disabled:cursor-not-allowed disabled:active:scale-100 disabled:hover:border-outline-variant;
+}
+
+/* ============================================================
+   DARK MODE OVERRIDES
+   Scoped to html.dark so the hero-section (always dark) is unaffected
+   ============================================================ */
+html.dark {
+  /* Backgrounds (Purple-tinted premium dark mode) */
+  --color-background:                #140d23;
+  --color-on-background:             #f8f6fc;
+
+  --color-surface:                   #1f1435;
+  --color-on-surface:                #f8f6fc;
+
+  --color-surface-bright:            #2b1d47;
+  --color-surface-dim:               #0b0614;
+
+  --color-surface-container-lowest:  #0b0614;
+  --color-surface-container-low:     #140d23;
+  --color-surface-container:         #140d23;
+  --color-surface-container-high:    #1f1435;
+  --color-surface-container-highest: #2b1d47;
+
+  --color-surface-variant:           #2b1d47;
+  --color-on-surface-variant:        #b8afcf;
+
+  --color-outline:                   #57477c;
+  --color-outline-variant:           #2b1d47;
+
+  /* Brand — slightly lighter purple for dark bg legibility */
+  --color-primary:                   #9d87f7;
+  --color-on-primary:                #1a1040;
+  --color-primary-container:         #3a2d80;
+  --color-on-primary-container:      #ede9fe;
+  --color-primary-fixed:             #c4b5fd;
+  --color-primary-fixed-dim:         #9d87f7;
+
+  --color-secondary:                 #a5b4fc;
+  --color-on-secondary:              #1a1040;
+  --color-secondary-container:       #2a3070;
+  --color-on-secondary-container:    #e0e7ff;
+  --color-secondary-fixed:           #c7d2fe;
+  --color-secondary-fixed-dim:       #a5b4fc;
+
+  --color-tertiary:                  #c084fc;
+  --color-on-tertiary:               #1e1040;
+  --color-tertiary-container:        #4a1070;
+  --color-on-tertiary-container:     #f3e8ff;
+  --color-tertiary-fixed:            #d8b4fe;
+  --color-tertiary-fixed-dim:        #c084fc;
+
+  --color-error:                     #f87171;
+  --color-on-error:                  #450a0a;
+  --color-error-container:           #7f1d1d;
+  --color-on-error-container:        #fecaca;
+
+  /* Inverse (used sparingly for reversed chips etc.) */
+  --color-inverse-surface:           #e6eaf0;
+  --color-inverse-on-surface:        #0d1117;
+  --color-inverse-primary:           #4834a4;
+  --color-surface-tint:              #9d87f7;
+}
+
+/* Inputs in dark mode */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: var(--color-surface-container);
+  border-color: var(--color-outline-variant);
+}
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  background-color: var(--color-surface-container-lowest);
   border-color: var(--color-primary);
 }
-
-.glow-primary {
-  box-shadow: 0 0 24px rgba(72, 52, 164, 0.3);
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--color-on-surface-variant);
+  opacity: 0.5;
 }
-
-.glow-tertiary {
-  box-shadow: 0 0 24px rgba(169, 151, 250, 0.3);
-}
-
-.glow-emerald {
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.3);
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(to right, var(--color-surface-container-high) 4%, var(--color-surface-container-highest) 25%, var(--color-surface-container-high) 36%);
-  background-size: 1000px 100%;
-}
-
-.text-gradient-animated {
-  background: linear-gradient(to right, var(--color-primary), var(--color-tertiary), var(--color-primary));
-  background-size: 200% auto;
-  color: #000;
-  background-clip: text;
-  text-fill-color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: shine 3s linear infinite;
-}
-
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
-}
-

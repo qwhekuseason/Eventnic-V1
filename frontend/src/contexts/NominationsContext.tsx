@@ -12,6 +12,7 @@ export interface NominationSubmission {
   nomineeName: string;
   nomineeDescription: string;
   phone?: string;
+  email?: string;
   imageUrl?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: number;

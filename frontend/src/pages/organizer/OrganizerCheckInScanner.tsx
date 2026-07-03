@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { app } from '../../config/firebase';
+import { Html5QrcodeScanner } from 'html5-qrcode';
+import toast from 'react-hot-toast';
 
 export default function OrganizerCheckInScanner() {
   const db = getFirestore(app);
@@ -9,46 +11,85 @@ export default function OrganizerCheckInScanner() {
   const [lastScanned, setLastScanned] = useState<{name: string, ticketType: string} | null>(null);
   const [lookupId, setLookupId] = useState('');
   const [isLookingUp, setIsLookingUp] = useState(false);
+  const [recentCheckIns, setRecentCheckIns] = useState<any[]>([]);
 
-  const simulateScan = (type: 'success' | 'error') => {
-    setScanStatus(type);
-    if (type === 'success') {
-      setLastScanned({ name: 'Alex Johnson', ticketType: 'VIP Access' });
-    } else {
-      setLastScanned(null);
-    }
-    
-    setTimeout(() => {
-      setScanStatus('idle');
-    }, 3000);
-  };
+  useEffect(() => {
+    // Initialize QR Code Scanner
+    const scanner = new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true },
+      false
+    );
 
-  const handleManualLookup = async () => {
-    if (!lookupId) return;
+    let isScanning = false;
+
+    scanner.render(
+      async (decodedText) => {
+        // Prevent rapid duplicate scans
+        if (isScanning) return;
+        isScanning = true;
+        
+        await handleScan(decodedText);
+        
+        setTimeout(() => {
+          isScanning = false;
+        }, 3000);
+      },
+      () => {
+        // ignore continuous scan errors
+      }
+    );
+
+    return () => {
+      scanner.clear().catch(console.error);
+    };
+  }, []);
+
+  const handleScan = async (ticketId: string) => {
+    setLookupId(ticketId);
     setIsLookingUp(true);
     try {
-      const ticketRef = doc(db, 'tickets', lookupId);
+      const ticketRef = doc(db, 'tickets', ticketId);
       const ticketSnap = await getDoc(ticketRef);
       
       if (!ticketSnap.exists()) {
-        simulateScan('error');
+        setScanStatus('error');
       } else {
         const tData = ticketSnap.data();
         if (tData.status === 'valid') {
           await updateDoc(ticketRef, { status: 'checked_in' });
-          setLastScanned({ name: 'Valid User', ticketType: tData.tierId });
+          
+          // Optionally fetch user to get their name
+          let userName = 'Attendee';
+          if (tData.userId) {
+            const userSnap = await getDoc(doc(db, 'users', tData.userId));
+            if (userSnap.exists()) {
+              userName = userSnap.data().name || 'Attendee';
+            }
+          }
+
+          const scannedData = { name: userName, ticketType: tData.tierId || 'General Admission' };
+          setLastScanned(scannedData);
           setScanStatus('success');
+          
+          setRecentCheckIns(prev => [scannedData, ...prev].slice(0, 5));
+          toast.success('Ticket Checked In successfully!');
         } else {
-          simulateScan('error'); // already checked in or cancelled
+          setScanStatus('error'); // already checked in or cancelled
+          toast.error(`Ticket status is ${tData.status}`);
         }
       }
     } catch (e) {
-      simulateScan('error');
+      console.error(e);
+      setScanStatus('error');
     } finally {
       setIsLookingUp(false);
-      setLookupId('');
       setTimeout(() => setScanStatus('idle'), 3000);
     }
+  };
+
+  const handleManualLookup = () => {
+    if (lookupId) handleScan(lookupId);
   };
 
   return (
@@ -68,59 +109,33 @@ export default function OrganizerCheckInScanner() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-xl max-w-4xl mx-auto">
           {/* Scanner Area */}
-          <div className="bg-surface rounded-3xl border border-outline-variant shadow-lg p-lg md:p-xl flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
+          <div className="bg-surface rounded-3xl border border-outline-variant shadow-lg p-lg md:p-xl flex flex-col items-center justify-center relative overflow-hidden">
             
-            {/* Simulated Camera View */}
-            <div className="absolute inset-0 bg-black/5 z-0 flex items-center justify-center">
-              {/* Target box */}
-              <div className="w-64 h-64 border-2 border-dashed border-primary/50 relative animate-pulse">
-                <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-primary"></div>
-                <div className="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-primary"></div>
-                <div className="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-primary"></div>
-                <div className="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-primary"></div>
-              </div>
-            </div>
+            <div className="w-full relative z-10" id="reader"></div>
 
-            <div className="relative z-10 w-full">
+            <div className="relative z-10 w-full mt-4 min-h-[120px]">
               {scanStatus === 'idle' && (
-                <div className="text-center text-secondary bg-surface/80 backdrop-blur-md p-md rounded-xl mx-auto max-w-xs">
-                  <span className="material-symbols-outlined text-[48px] mb-sm block">qr_code_scanner</span>
-                  <p className="font-bold">Position QR code within the frame to scan.</p>
+                <div className="text-center text-secondary bg-surface-container p-md rounded-xl mx-auto max-w-[320px]">
+                  <p className="font-bold">Waiting for scan...</p>
                 </div>
               )}
 
               {scanStatus === 'success' && (
-                <div className="text-center bg-green-50 text-green-800 p-lg rounded-2xl border border-green-200 shadow-lg animate-in zoom-in">
-                  <span className="material-symbols-outlined text-[64px] text-green-600 block mb-sm">check_circle</span>
-                  <h3 className="font-display text-2xl font-bold mb-xs">Valid Ticket!</h3>
-                  <p className="font-bold text-lg">{lastScanned?.name}</p>
+                <div className="text-center bg-emerald-500/10 text-green-800 p-md rounded-2xl border border-emerald-500/30 shadow-lg animate-in zoom-in">
+                  <span className="material-symbols-outlined text-[48px] text-emerald-600 dark:text-emerald-400 block mb-xs">check_circle</span>
+                  <h3 className="font-display text-xl font-bold mb-xs">Valid Ticket!</h3>
+                  <p className="font-bold">{lastScanned?.name}</p>
                   <p className="text-sm opacity-80">{lastScanned?.ticketType}</p>
                 </div>
               )}
 
               {scanStatus === 'error' && (
-                <div className="text-center bg-red-50 text-red-800 p-lg rounded-2xl border border-red-200 shadow-lg animate-in zoom-in">
-                  <span className="material-symbols-outlined text-[64px] text-red-600 block mb-sm">cancel</span>
-                  <h3 className="font-display text-2xl font-bold mb-xs">Invalid Ticket</h3>
-                  <p className="font-bold">This QR code is not recognized or has already been used.</p>
+                <div className="text-center bg-error-container text-red-800 p-md rounded-2xl border border-error/30 shadow-lg animate-in zoom-in">
+                  <span className="material-symbols-outlined text-[48px] text-error block mb-xs">cancel</span>
+                  <h3 className="font-display text-xl font-bold mb-xs">Invalid Ticket</h3>
+                  <p className="font-bold text-sm">This QR code is not recognized or has already been used.</p>
                 </div>
               )}
-            </div>
-
-            {/* Test Buttons - Since we can't use real camera */}
-            <div className="absolute bottom-lg flex gap-sm z-20">
-              <button 
-                onClick={() => simulateScan('success')}
-                className="bg-green-600 text-white px-md py-sm rounded-full text-sm font-bold shadow-md hover:bg-green-700"
-              >
-                Simulate Valid Scan
-              </button>
-              <button 
-                onClick={() => simulateScan('error')}
-                className="bg-red-600 text-white px-md py-sm rounded-full text-sm font-bold shadow-md hover:bg-red-700"
-              >
-                Simulate Invalid Scan
-              </button>
             </div>
           </div>
 
@@ -128,8 +143,8 @@ export default function OrganizerCheckInScanner() {
           <div className="space-y-lg">
             <div className="bg-primary text-white rounded-2xl p-lg shadow-sm flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-primary-container mb-xs">Checked In</h3>
-                <div className="font-display text-[48px] leading-none">842 <span className="text-xl text-primary-container font-body-md">/ 1,500</span></div>
+                <h3 className="font-bold text-primary-container mb-xs">Recent Scans</h3>
+                <div className="font-display text-[48px] leading-none">{recentCheckIns.length}</div>
               </div>
               <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
                 <span className="material-symbols-outlined text-[32px]">how_to_reg</span>
@@ -138,7 +153,7 @@ export default function OrganizerCheckInScanner() {
 
             <div className="bg-surface rounded-2xl border border-outline-variant shadow-sm p-lg">
               <h3 className="font-bold text-on-surface mb-md">Manual Entry Lookup</h3>
-              <p className="text-sm text-secondary mb-md">If a scanner is not working, enter the ticket ID or attendee email below.</p>
+              <p className="text-sm text-secondary mb-md">If a scanner is not working, enter the ticket ID.</p>
               
               <div className="flex gap-sm">
                 <input 
@@ -151,7 +166,7 @@ export default function OrganizerCheckInScanner() {
                 <button 
                   onClick={handleManualLookup}
                   disabled={isLookingUp}
-                  className="bg-surface-container-highest text-on-surface font-bold px-lg rounded-xl hover:bg-outline-variant transition-colors"
+                  className="bg-surface-container-highest text-on-surface font-bold px-lg rounded-xl hover:bg-outline-variant transition-colors cursor-pointer"
                 >
                   {isLookingUp ? '...' : 'Lookup'}
                 </button>
@@ -160,17 +175,21 @@ export default function OrganizerCheckInScanner() {
 
             <div className="bg-surface rounded-2xl border border-outline-variant shadow-sm p-lg">
               <h3 className="font-bold text-on-surface mb-md">Recent Check-Ins</h3>
-              <div className="space-y-sm">
-                {[1,2,3].map(i => (
-                  <div key={i} className="flex justify-between items-center py-sm border-b border-outline-variant last:border-0">
-                    <div>
-                      <div className="font-bold text-sm text-on-surface">Attendee Name {i}</div>
-                      <div className="text-secondary text-xs">General Admission</div>
+              {recentCheckIns.length === 0 ? (
+                <p className="text-sm text-secondary">No check-ins yet.</p>
+              ) : (
+                <div className="space-y-sm">
+                  {recentCheckIns.map((r, i) => (
+                    <div key={i} className="flex justify-between items-center py-sm border-b border-outline-variant last:border-0">
+                      <div>
+                        <div className="font-bold text-sm text-on-surface">{r.name}</div>
+                        <div className="text-secondary text-xs">{r.ticketType}</div>
+                      </div>
+                      <div className="text-xs text-secondary">Just now</div>
                     </div>
-                    <div className="text-xs text-secondary">Just now</div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

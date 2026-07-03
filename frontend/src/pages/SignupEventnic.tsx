@@ -83,7 +83,7 @@ export default function SignupEventnic() {
   return (
     <div className="min-h-screen w-full flex bg-background">
       {/* Left side - Image */}
-      <div className="relative hidden w-0 flex-1 lg:block bg-gradient-dark overflow-hidden">
+      <div className="relative hidden w-0 flex-1 lg:block hero-section overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/stitch-d87c03b4f4503fee.png')] bg-cover bg-center mix-blend-overlay opacity-40"></div>
         
         {/* Decorative glass elements */}
@@ -120,8 +120,8 @@ export default function SignupEventnic() {
 
           <div className="mt-8">
             {error && (
-              <div className="mb-4 rounded-lg bg-red-50 p-4 border border-red-200">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="mb-4 rounded-lg bg-error-container p-4 border border-error/30">
+                <p className="text-sm text-on-error-container">{error}</p>
               </div>
             )}
             <form className="space-y-5" onSubmit={handleSubmit}>
@@ -146,7 +146,7 @@ export default function SignupEventnic() {
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-3 text-xs text-secondary">
                   <span>At least 8 characters; include uppercase, numbers, and a special symbol for strong protection.</span>
-                  <span className={`font-semibold ${getPasswordStrength(password) === 'strong' ? 'text-emerald-600' : getPasswordStrength(password) === 'fair' ? 'text-amber-600' : 'text-red-600'}`}>
+                  <span className={`font-semibold ${getPasswordStrength(password) === 'strong' ? 'text-emerald-600' : getPasswordStrength(password) === 'fair' ? 'text-amber-600' : 'text-error'}`}>
                     {password ? `${getPasswordStrength(password).toUpperCase()} strength` : 'Enter a password'}
                   </span>
                 </div>

@@ -17,7 +17,7 @@ export default function TicketLookupEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero */}
-      <section className="relative pt-[160px] pb-[80px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[80px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[10%] left-[30%] w-[500px] h-[500px] rounded-full bg-tertiary/20 blur-[120px]" />
         </div>
@@ -39,11 +39,11 @@ export default function TicketLookupEventnic() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white rounded-[24px] p-xl md:p-xxl border border-outline-variant shadow-xl"
+            className="bg-surface rounded-[24px] p-xl md:p-xxl border border-outline-variant shadow-xl"
           >
             {status === 'success' ? (
               <div className="text-center py-lg">
-                <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-lg">
+                <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-lg">
                   <span className="material-symbols-outlined text-green-500 text-[40px]">mark_email_read</span>
                 </div>
                 <h2 className="font-display text-[28px] text-on-surface mb-sm">Check your inbox!</h2>

@@ -7,7 +7,7 @@ export default function ContactEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero */}
-      <section className="relative pt-[160px] pb-[80px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[80px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] left-[20%] w-[500px] h-[500px] rounded-full bg-tertiary/20 blur-[120px]" />
           <div className="absolute bottom-[-10%] -right-[5%] w-[400px] h-[400px] rounded-full bg-primary/30 blur-[100px]" />
@@ -31,7 +31,7 @@ export default function ContactEventnic() {
             {/* Contact Info Cards */}
             <div className="lg:col-span-2 space-y-lg">
               <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}
-                className="bg-white rounded-[20px] p-xl border border-outline-variant shadow-lg"
+                className="bg-surface rounded-[20px] p-xl border border-outline-variant shadow-lg"
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg">
                   <span className="material-symbols-outlined text-white">mail</span>
@@ -42,7 +42,7 @@ export default function ContactEventnic() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.1 }}
-                className="bg-white rounded-[20px] p-xl border border-outline-variant shadow-lg"
+                className="bg-surface rounded-[20px] p-xl border border-outline-variant shadow-lg"
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg">
                   <span className="material-symbols-outlined text-white">chat</span>
@@ -53,7 +53,7 @@ export default function ContactEventnic() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
-                className="bg-white rounded-[20px] p-xl border border-outline-variant shadow-lg"
+                className="bg-surface rounded-[20px] p-xl border border-outline-variant shadow-lg"
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg">
                   <span className="material-symbols-outlined text-white">location_on</span>
@@ -69,7 +69,7 @@ export default function ContactEventnic() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="lg:col-span-3 bg-white rounded-[24px] p-xl md:p-xxl border border-outline-variant shadow-xl"
+              className="lg:col-span-3 bg-surface rounded-[24px] p-xl md:p-xxl border border-outline-variant shadow-xl"
             >
               <h2 className="font-display text-[32px] text-on-surface mb-xs">Send us a message</h2>
               <p className="text-secondary font-body-md mb-xl">Fill out the form below and we'll get back to you shortly.</p>
@@ -93,7 +93,7 @@ export default function ContactEventnic() {
 
                 <div className="space-y-xs">
                   <label className="font-label-md text-on-surface" htmlFor="contact-subject">Subject</label>
-                  <select id="contact-subject" className="w-full h-12 px-md rounded-xl border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all font-body-md appearance-none bg-white">
+                  <select id="contact-subject" className="w-full h-12 px-md rounded-xl border border-outline-variant focus:ring-2 focus:ring-primary outline-none transition-all font-body-md appearance-none bg-surface">
                     <option value="">Select a topic</option>
                     <option>General Inquiry</option>
                     <option>Technical Support</option>

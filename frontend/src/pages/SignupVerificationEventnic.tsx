@@ -37,7 +37,7 @@ export default function SignupVerificationEventnic() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 text-center">
-        <div className="max-w-md rounded-3xl border border-outline-variant bg-surface p-10 shadow-lg">
+        <div className="max-w-[448px] rounded-3xl border border-outline-variant bg-surface p-10 shadow-lg">
           <h1 className="font-display text-2xl text-on-surface mb-4">Continue Signup</h1>
           <p className="text-secondary mb-6">Please sign in again or start your signup to continue verification.</p>
           <Link to="/signup" className="inline-flex px-6 py-3 rounded-full bg-primary text-white font-semibold hover:bg-primary-container transition-colors">Start signup</Link>
@@ -126,8 +126,8 @@ export default function SignupVerificationEventnic() {
 
           <div className="mt-8">
             {error && (
-              <div className="mb-4 rounded-lg bg-red-50 p-4 border border-red-200">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="mb-4 rounded-lg bg-error-container p-4 border border-error/30">
+                <p className="text-sm text-on-error-container">{error}</p>
               </div>
             )}
             <form className="space-y-5" onSubmit={handleSubmit}>

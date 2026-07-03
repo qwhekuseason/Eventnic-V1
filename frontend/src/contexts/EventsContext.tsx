@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, getDoc } from 'firebase/firestore';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { getFirestore, collection, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { app } from '../config/firebase';
 
 export type EventStatus = 'draft' | 'pending' | 'published' | 'rejected';
@@ -34,6 +34,7 @@ export interface Nominee {
   name: string;
   description: string;
   votes: number;
+  email?: string;
   imageUrl?: string;
 }
 
@@ -122,6 +123,12 @@ export const eventSoldPct = (e: EventRecord) => {
   const cap = eventCapacity(e);
   return cap > 0 ? Math.round((eventSold(e) / cap) * 100) : 0;
 };
+export const eventTotalVotes = (e: EventRecord) =>
+  e.votingEnabled ? e.votingCategories.reduce((acc, cat) => acc + cat.nominees.reduce((n, nom) => n + nom.votes, 0), 0) : 0;
+export const eventVotingRevenue = (e: EventRecord) =>
+  eventTotalVotes(e) * (e.votePrice || 0);
+export const eventTotalRevenue = (e: EventRecord) =>
+  eventRevenue(e) + eventVotingRevenue(e);
 
 export interface PlatformTotals {
   totalEvents: number;
@@ -168,8 +175,8 @@ interface EventsContextType {
   deleteEvent: (id: string) => Promise<void>;
   approveEvent: (id: string) => Promise<void>;
   rejectEvent: (id: string) => Promise<void>;
-  castVote: (eventId: string, categoryId: string, nomineeId: string) => Promise<boolean>;
-  recordPurchase: (eventId: string, tierId: string, qty: number) => Promise<void>;
+  castVote: (eventId: string, categoryId: string, nomineeId: string, qty?: number) => Promise<boolean>;
+  recordPurchase: (eventId: string, tierId: string, qty: number, attendeeNames?: string[]) => Promise<void>;
   // draft
   updateDraft: (patch: Partial<DraftEvent>) => void;
   resetDraft: () => void;
@@ -311,25 +318,23 @@ export function EventsProvider({ children }: { children: ReactNode }) {
 
   const createEvent = useCallback(
     async (data: DraftEvent, status: EventStatus, organizerEmail: string, organizerName: string, votePrice: number): Promise<EventRecord> => {
-      const newId = uid();
-      const record: EventRecord = {
-        ...data,
-        id: newId,
-        slug: slugify(data.title || 'untitled-event') + '-' + newId.slice(0, 4),
-        organizerEmail,
-        organizerName,
-        votePrice,
-        status,
-        createdAt: Date.now(),
-        votingEndDate: data.votingEndDate,
-        ticketTiers: data.ticketTiers.map((t) => ({ ...t, sold: 0 })),
-        votingCategories: data.votingCategories.map((c) => ({
-          ...c,
-          nominees: c.nominees.map((n) => ({ ...n, votes: 0 })),
-        })),
-      };
-      await setDoc(doc(db, 'events', newId), record);
-      return record;
+      const token = await auth.currentUser?.getIdToken();
+      
+      const response = await fetch('http://localhost:5000/api/events/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ data, status, organizerEmail, organizerName, votePrice })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create event via backend');
+      }
+
+      const result = await response.json();
+      return result.record;
     },
     [],
   );
@@ -351,95 +356,57 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const castVote = useCallback(
-    async (eventId: string, categoryId: string, nomineeId: string): Promise<boolean> => {
+    async (eventId: string, categoryId: string, nomineeId: string, qty: number = 1): Promise<boolean> => {
       let voterId = localStorage.getItem('anonVoterId');
-      let firebaseUser = auth.currentUser;
 
       if (!voterId) {
         voterId = uid();
         localStorage.setItem('anonVoterId', voterId);
       }
 
-      if (!firebaseUser) {
-        try {
-          const credential = await signInAnonymously(auth);
-          firebaseUser = credential.user;
-        } catch (error) {
-          console.error('Anonymous sign-in failed for voting:', error);
+      try {
+        const response = await fetch('http://localhost:5000/api/events/vote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eventId, categoryId, nomineeId, qty, voterId })
+        });
+
+        if (!response.ok) {
+          console.error('Backend rejected vote');
+          return false;
         }
+
+        const key = `${eventId}:${categoryId}`;
+        setVotes((prev) => [...prev, key]);
+        return true;
+      } catch (error) {
+        console.error('Vote failed:', error);
+        return false;
       }
-
-      const key = `${eventId}:${categoryId}`;
-      if (votes.includes(key)) return false;
-      
-      const eventRef = doc(db, 'events', eventId);
-      const snap = await getDoc(eventRef);
-      if (!snap.exists()) return false;
-      
-      const eventData = snap.data() as EventRecord;
-      if (eventData.votingEnabled && eventData.votingEndDate) {
-        const now = new Date();
-        const endDate = new Date(eventData.votingEndDate);
-        endDate.setHours(23, 59, 59, 999);
-        if (now > endDate) return false;
-      }
-
-      const updatedCategories = eventData.votingCategories.map((c) =>
-        c.id !== categoryId
-          ? c
-          : {
-              ...c,
-              nominees: c.nominees.map((n) => (n.id === nomineeId ? { ...n, votes: n.votes + 1 } : n)),
-            },
-      );
-      
-      // Update event doc
-      await updateDoc(eventRef, { votingCategories: updatedCategories });
-      
-      // Write to votes collection
-      const voteId = uid();
-      await setDoc(doc(db, 'votes', voteId), {
-        id: voteId,
-        eventId,
-        categoryId,
-        nomineeId,
-        voterId,
-        createdAt: Date.now()
-      });
-
-      setVotes((prev) => [...prev, key]);
-      return true;
     },
     [votes],
   );
 
-  const recordPurchase = useCallback(async (eventId: string, tierId: string, qty: number) => {
-    const user = auth.currentUser;
-    if (!user) return;
-    
-    const eventRef = doc(db, 'events', eventId);
-    const snap = await getDoc(eventRef);
-    if (!snap.exists()) return;
-    
-    const eventData = snap.data() as EventRecord;
-    const updatedTiers = eventData.ticketTiers.map((t) =>
-      t.id === tierId ? { ...t, sold: Math.min(t.quantity, t.sold + qty) } : t,
-    );
-    
-    // Update event doc
-    await updateDoc(eventRef, { ticketTiers: updatedTiers });
-    
-    // Write to tickets collection
-    for (let i = 0; i < qty; i++) {
-      const ticketId = uid();
-      await setDoc(doc(db, 'tickets', ticketId), {
-        id: ticketId,
-        eventId,
-        tierId,
-        userId: user.uid,
-        status: 'valid', // valid, checked_in, cancelled
-        createdAt: Date.now()
+  const recordPurchase = useCallback(async (eventId: string, tierId: string, qty: number, attendeeNames?: string[]) => {
+    try {
+      const auth = getAuth(app);
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : null;
+      const res = await fetch(`http://localhost:5000/api/events/purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ eventId, tierId, qty, attendeeNames }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to purchase ticket via backend');
+      }
+    } catch (err) {
+      console.error('recordPurchase error:', err);
+      throw err;
     }
   }, []);
 

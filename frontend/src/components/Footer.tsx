@@ -15,8 +15,8 @@ const Footer = memo(function Footer() {
 
   return (
     <footer className="w-full relative bg-surface-container-low overflow-hidden">
-      {/* Decorative top border gradient */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-tertiary to-primary"></div>
+      {/* Decorative top border */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
       
       <div className="max-w-container-max mx-auto px-margin pt-xxl pb-lg">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-xl mb-xxl">
@@ -99,7 +99,7 @@ const Footer = memo(function Footer() {
             </div>
             <div className="flex items-center gap-xs text-secondary hover:text-on-surface transition-colors cursor-pointer">
               <span className="material-symbols-outlined text-[20px]">universal_currency</span>
-              <span className="font-label-sm">USD ($)</span>
+              <span className="font-label-sm">GHS (GH₵)</span>
             </div>
           </div>
         </div>

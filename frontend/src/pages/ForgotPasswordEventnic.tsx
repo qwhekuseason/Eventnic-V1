@@ -20,7 +20,7 @@ export default function ForgotPasswordEventnic() {
         transition={{ duration: 0.5 }}
         className="relative z-10 w-full max-w-[448px] mx-auto px-md"
       >
-        <div className="bg-white rounded-[24px] border border-outline-variant shadow-xl p-xl md:p-xxl">
+        <div className="bg-surface rounded-[24px] border border-outline-variant shadow-xl p-xl md:p-xxl">
           <div className="text-center mb-xl">
             <Link to="/" className="inline-block mb-lg">
               <Logo />

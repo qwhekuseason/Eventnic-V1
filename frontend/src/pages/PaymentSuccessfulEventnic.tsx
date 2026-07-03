@@ -36,7 +36,7 @@ export default function PaymentSuccessfulEventnic() {
 <div className="flex-grow">
 <div className="flex items-center gap-sm mb-xs">
 <span className="bg-secondary-container text-on-secondary-container px-sm py-xs rounded text-[10px] font-bold uppercase tracking-tighter">Conference</span>
-<span className="bg-green-100 text-green-700 px-sm py-xs rounded text-[10px] font-bold uppercase tracking-tighter">Paid</span>
+<span className="bg-green-100 text-emerald-600 dark:text-emerald-400 px-sm py-xs rounded text-[10px] font-bold uppercase tracking-tighter">Paid</span>
 </div>
 <h3 className="font-headline-md text-headline-md text-on-surface mb-xs">Global Tech Summit 2024</h3>
 <div className="flex items-center gap-xs text-secondary font-body-sm text-body-sm mb-xs">
@@ -52,15 +52,15 @@ export default function PaymentSuccessfulEventnic() {
 <div className="bg-surface-container rounded-lg p-md">
 <div className="flex justify-between items-center mb-xs">
 <span className="font-body-md text-body-md text-secondary">2x Premium Access Pass</span>
-<span className="font-body-md text-body-md text-on-surface font-semibold">$598.00</span>
+<span className="font-body-md text-body-md text-on-surface font-semibold">GH₵ 598.00</span>
 </div>
 <div className="flex justify-between items-center mb-md">
 <span className="font-body-md text-body-md text-secondary">Processing Fee</span>
-<span className="font-body-md text-body-md text-on-surface font-semibold">$12.50</span>
+<span className="font-body-md text-body-md text-on-surface font-semibold">GH₵ 12.50</span>
 </div>
 <div className="flex justify-between items-center border-t border-outline-variant pt-md">
 <span className="font-headline-sm text-headline-sm text-on-surface">Total</span>
-<span className="font-headline-sm text-headline-sm text-primary">$610.50</span>
+<span className="font-headline-sm text-headline-sm text-primary">GH₵ 610.50</span>
 </div>
 </div>
 </div>
@@ -69,7 +69,7 @@ export default function PaymentSuccessfulEventnic() {
 <div className="bg-primary text-on-primary rounded-xl p-lg shadow-sm flex flex-col items-center text-center">
 <span className="material-symbols-outlined text-[48px] mb-md">confirmation_number</span>
 <h4 className="font-headline-sm text-headline-sm mb-md">Your ticket is ready</h4>
-<button onClick={() => navigate('/my-tickets')} className="w-full bg-white text-primary font-label-md text-label-md py-md rounded-lg hover:bg-slate-50 transition-colors mb-sm flex items-center justify-center gap-sm">
+<button onClick={() => navigate('/my-tickets')} className="w-full bg-surface text-primary font-label-md text-label-md py-md rounded-lg hover:bg-surface-container-low transition-colors mb-sm flex items-center justify-center gap-sm">
 <span className="material-symbols-outlined">download</span>
                             Download Ticket
                         </button>

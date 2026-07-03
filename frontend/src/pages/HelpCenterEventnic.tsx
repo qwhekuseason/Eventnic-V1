@@ -7,7 +7,7 @@ const FAQ_ITEMS = [
   { q: 'How do I get paid after my event?', a: 'Eventnic offers next-day payouts. Navigate to Dashboard → Payout Settings to add your bank account or payment method. After your event concludes, funds are automatically transferred within 1 business day.' },
   { q: 'Can I issue refunds to attendees?', a: 'Yes! Go to your Event Dashboard → Attendees, select the orders you want to refund, and click "Issue Refund." You can choose full or partial refunds. Refunds are processed within 5-10 business days.' },
   { q: 'What payment methods do attendees have?', a: 'Attendees can pay using credit/debit cards (Visa, Mastercard, Amex), Apple Pay, Google Pay, and PayPal. We support 135+ currencies for international events.' },
-  { q: 'Is there a fee for using Eventnic?', a: 'Eventnic charges 0% setup fees. We take a small service fee per ticket sold (2.5% + $0.99). Free events have no fees at all. Check our Pricing page for detailed plan information.' },
+  { q: 'Is there a fee for using Eventnic?', a: 'Eventnic charges 0% setup fees. We take a small service fee per ticket sold (2.5% + GH₵ 10). Free events have no fees at all. Check our Pricing page for detailed plan information.' },
   { q: 'Can I customize my event page?', a: 'Absolutely! You can upload cover images, add detailed descriptions, embed videos, customize your color scheme, and add custom fields to your registration forms.' },
   { q: 'How does check-in work at the event?', a: 'Each ticket generates a unique QR code. Use our free Eventnic Scanner app (iOS & Android) to scan attendees in at the door. You can also use manual check-in from the Attendees page.' },
   { q: 'Can I transfer or sell my ticket?', a: 'If the organizer has enabled ticket transfers, you can transfer your ticket to another person from the My Tickets page. Simply click "Transfer" and enter the recipient\'s email.' },
@@ -28,7 +28,7 @@ export default function HelpCenterEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero */}
-      <section className="relative pt-[160px] pb-[80px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[80px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] left-[30%] w-[600px] h-[600px] rounded-full bg-tertiary/15 blur-[120px]" />
           <div className="absolute bottom-[-20%] -right-[5%] w-[400px] h-[400px] rounded-full bg-primary/25 blur-[100px]" />
@@ -61,7 +61,7 @@ export default function HelpCenterEventnic() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="bg-white rounded-[20px] p-xl border border-outline-variant shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
+                className="bg-surface rounded-[20px] p-xl border border-outline-variant shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
               >
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined text-white">{cat.icon}</span>
@@ -91,7 +91,7 @@ export default function HelpCenterEventnic() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
-                className="bg-white rounded-[16px] border border-outline-variant shadow-sm group"
+                className="bg-surface rounded-[16px] border border-outline-variant shadow-sm group"
               >
                 <summary className="flex items-center justify-between p-lg cursor-pointer font-label-md text-on-surface list-none [&::-webkit-details-marker]:hidden">
                   <span className="pr-lg">{item.q}</span>
@@ -108,13 +108,13 @@ export default function HelpCenterEventnic() {
 
       {/* Still Need Help CTA */}
       <section className="py-[80px] px-margin">
-        <div className="max-w-container-max mx-auto rounded-[32px] bg-gradient-dark p-xl md:p-[60px] text-center relative overflow-hidden">
+        <div className="max-w-container-max mx-auto rounded-[32px] hero-section p-xl md:p-[60px] text-center relative overflow-hidden">
           <div className="absolute -top-[50%] -left-[10%] w-[400px] h-[400px] rounded-full bg-primary/30 blur-[80px]" />
           <div className="absolute -bottom-[50%] -right-[10%] w-[400px] h-[400px] rounded-full bg-tertiary/20 blur-[80px]" />
           <div className="relative z-10">
             <h2 className="font-display text-[32px] text-white mb-md">Still need help?</h2>
             <p className="text-white/80 font-body-lg mb-xl max-w-[448px] mx-auto">Our support team is available 24/7. Reach out and we'll get back to you in no time.</p>
-            <Link to="/contact" className="inline-block bg-white text-primary font-bold font-headline-sm px-[32px] py-[14px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all">
+            <Link to="/contact" className="inline-block bg-surface text-primary font-bold font-headline-sm px-[32px] py-[14px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all">
               Contact Support
             </Link>
           </div>

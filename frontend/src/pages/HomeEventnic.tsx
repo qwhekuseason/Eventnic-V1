@@ -9,7 +9,7 @@ const priceLabel = (e) => {
   const prices = e.ticketTiers.map((t) => Number(t.price)).filter((p) => p > 0);
   if (prices.length === 0) return 'Free';
   const min = Math.min(...prices);
-  return e.ticketTiers.length > 1 ? `From $${min.toLocaleString()}` : `$${min.toLocaleString()}`;
+  return e.ticketTiers.length > 1 ? `From GH₵ ${min.toLocaleString()}` : `GH₵ ${min.toLocaleString()}`;
 };
 
 export default function HomeEventnic() {
@@ -32,34 +32,12 @@ export default function HomeEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-[160px] pb-[120px] overflow-hidden bg-gradient-dark">
-        {/* Abstract Background Shapes & Floating Elements */}
+      <section className="relative pt-[160px] pb-[120px] overflow-hidden hero-section">
+        {/* Clean Professional Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-          {/* Static background shapes */}
-          <div className="absolute -top-[20%] -left-[10%] w-[800px] h-[800px] rounded-full bg-primary/20 blur-[120px]" />
-          <div className="absolute top-[20%] -right-[20%] w-[1000px] h-[1000px] rounded-full bg-tertiary/20 blur-[150px]" />
-          <div className="absolute bottom-0 left-[20%] w-[600px] h-[600px] rounded-full bg-secondary/20 blur-[100px]" />
-          
-          {/* Floating elements hidden on slow connections */}
-          {!shouldReduceMotion && (
-            <>
-              <motion.div animate={{ y: [0, -30, 0], rotate: [-10, 5, -10] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[25%] left-[10%] hidden md:flex w-20 h-20 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 items-center justify-center shadow-2xl">
-                <span className="material-symbols-outlined text-white text-[40px]">confirmation_number</span>
-              </motion.div>
-              <motion.div animate={{ y: [0, 40, 0], rotate: [15, -10, 15] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }} className="absolute bottom-[20%] right-[10%] hidden md:flex w-24 h-24 bg-tertiary/20 backdrop-blur-md rounded-full border border-tertiary/30 items-center justify-center shadow-2xl">
-                <span className="material-symbols-outlined text-tertiary text-[48px]">how_to_vote</span>
-              </motion.div>
-              <motion.div animate={{ y: [0, -20, 0], rotate: [5, -5, 5], scale: [1, 1.1, 1] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }} className="absolute top-[15%] right-[20%] hidden xl:flex w-16 h-16 bg-primary/30 backdrop-blur-md rounded-xl border border-primary/40 items-center justify-center shadow-2xl">
-                <span className="material-symbols-outlined text-white text-[32px]">local_activity</span>
-              </motion.div>
-              <motion.div animate={{ y: [0, -25, 0], rotate: [-5, 10, -5], scale: [0.9, 1, 0.9] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.5 }} className="absolute bottom-[25%] left-[15%] hidden lg:flex w-16 h-16 bg-emerald-500/20 backdrop-blur-md rounded-2xl border border-emerald-400/30 items-center justify-center shadow-2xl">
-                <span className="material-symbols-outlined text-emerald-400 text-[32px]">qr_code_scanner</span>
-              </motion.div>
-              <motion.div animate={{ y: [0, 30, 0], rotate: [10, -15, 10] }} transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} className="absolute top-[35%] right-[8%] hidden lg:flex w-14 h-14 bg-amber-500/20 backdrop-blur-md rounded-full border border-amber-400/30 items-center justify-center shadow-2xl">
-                <span className="material-symbols-outlined text-amber-400 text-[28px]">campaign</span>
-              </motion.div>
-            </>
-          )}
+          {/* Subtle grid or clean gradient rather than messy blobs */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-60"></div>
+          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-repeat opacity-5 mix-blend-overlay"></div>
         </div>
 
         <div className="max-w-container-max mx-auto px-margin relative z-10 text-center">
@@ -76,7 +54,7 @@ export default function HomeEventnic() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-transparent bg-clip-text text-gradient-animated"
+                className="text-primary"
               >
                 {taglines[taglineIndex]}
               </motion.span>
@@ -86,19 +64,19 @@ export default function HomeEventnic() {
             </p>
             
             {/* Search/Action Bar */}
-            <div className="glass-panel-dark max-w-2xl mx-auto rounded-full p-2 flex items-center shadow-2xl mb-xl">
-              <span className="material-symbols-outlined text-white/50 ml-md mr-sm">search</span>
+            <div className="bg-white/10 border border-white/20 max-w-2xl mx-auto rounded-full p-2 flex items-center shadow-2xl mb-xl backdrop-blur-md">
+              <span className="material-symbols-outlined text-white/70 ml-md mr-sm">search</span>
               <input 
                 type="text" 
                 placeholder="Search upcoming events..." 
-                className="flex-grow bg-transparent border-none outline-none text-white placeholder-white/50 font-body-md"
+                className="flex-grow !bg-transparent border-none outline-none text-white placeholder-white/70 font-body-md"
                 onKeyDown={(e) => {
                   if(e.key === 'Enter') navigate('/explore');
                 }}
               />
               <button 
                 onClick={() => navigate('/create-event/basic-info')}
-                className="bg-primary hover:bg-tertiary text-white px-xl py-sm rounded-full font-bold font-label-md shadow-lg hover:scale-105 active:scale-95 transition-all whitespace-nowrap glow-primary"
+                className="bg-primary hover:bg-tertiary text-white px-xl py-sm rounded-full font-bold font-label-md shadow-lg hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
               >
                 Create Event
               </button>
@@ -114,34 +92,34 @@ export default function HomeEventnic() {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-[80px] bg-surface-container-lowest border-b border-outline-variant relative z-20">
+      <section className="py-[80px] bg-surface border-b border-outline-variant relative z-20">
         <div className="max-w-container-max mx-auto px-margin">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-lg text-center">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-transparent bg-clip-text bg-gradient-premium leading-none mb-sm">2,500+</h3>
-              <p className="text-secondary font-body-md font-medium">Events Hosted</p>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">2,500+</h3>
+              <p className="text-on-surface font-body-md font-medium">Events Hosted</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-transparent bg-clip-text bg-gradient-premium leading-none mb-sm">500K+</h3>
-              <p className="text-secondary font-body-md font-medium">Votes Cast</p>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">500K+</h3>
+              <p className="text-on-surface font-body-md font-medium">Votes Cast</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-transparent bg-clip-text bg-gradient-premium leading-none mb-sm">100K+</h3>
-              <p className="text-secondary font-body-md font-medium">Tickets Sold</p>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">100K+</h3>
+              <p className="text-on-surface font-body-md font-medium">Tickets Sold</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.4 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-transparent bg-clip-text bg-gradient-premium leading-none mb-sm">1M+</h3>
-              <p className="text-secondary font-body-md font-medium">Global Reach</p>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">1M+</h3>
+              <p className="text-on-surface font-body-md font-medium">Global Reach</p>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* Advanced Features Section */}
-      <section className="py-[120px] bg-white border-b border-outline-variant relative z-20">
+      <section className="py-[120px] bg-surface border-b border-outline-variant relative z-20">
         <div className="max-w-container-max mx-auto px-margin">
           <div className="text-center mb-xxl">
-            <h2 className="font-display text-[40px] text-on-surface leading-tight mb-md">Everything you need. <br/> <span className="text-transparent bg-clip-text bg-gradient-premium">Nothing you don't.</span></h2>
+            <h2 className="font-display text-[40px] text-on-surface leading-tight mb-md">Everything you need. <br/> <span className="text-gradient-premium">Nothing you don't.</span></h2>
             <p className="text-secondary font-body-lg max-w-2xl mx-auto">
               Eventnic comes packed with advanced features built specifically for modern event organizers. Automate the tedious parts and focus on the experience.
             </p>
@@ -229,7 +207,7 @@ export default function HomeEventnic() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   onClick={() => navigate(`/event/${event.slug}`)}
-                  className="card-hover group bg-white rounded-[24px] overflow-hidden border border-outline-variant cursor-pointer"
+                  className="card-hover group bg-surface rounded-[24px] overflow-hidden border border-outline-variant cursor-pointer"
                 >
                   <div className="h-[240px] relative overflow-hidden bg-surface-variant">
                     {event.coverImage ? (
@@ -241,10 +219,10 @@ export default function HomeEventnic() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    <div className="absolute top-4 left-4 glass-panel text-white px-sm py-xs rounded-lg font-bold text-sm backdrop-blur-md">
+                    <div className="absolute top-4 left-4 bg-black/60 text-white px-sm py-xs rounded-lg font-bold text-sm backdrop-blur-md">
                       {event.date || 'TBA'}
                     </div>
-                    <div className="absolute top-4 right-4 bg-white text-on-surface px-sm py-xs rounded-full font-bold text-sm shadow-md">
+                    <div className="absolute top-4 right-4 bg-surface text-on-surface px-sm py-xs rounded-full font-bold text-sm shadow-md">
                       {priceLabel(event)}
                     </div>
                   </div>
@@ -287,11 +265,10 @@ export default function HomeEventnic() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="max-w-container-max mx-auto rounded-[40px] bg-gradient-dark p-xl md:p-[100px] text-center relative overflow-hidden shadow-2xl"
+          className="max-w-container-max mx-auto rounded-[40px] hero-section p-xl md:p-[100px] text-center relative overflow-hidden shadow-2xl border border-white/5"
         >
-          {/* Decorative circles */}
-          <div className="absolute -top-[50%] -left-[10%] w-[500px] h-[500px] rounded-full bg-primary/30 blur-[80px]"></div>
-          <div className="absolute -bottom-[50%] -right-[10%] w-[500px] h-[500px] rounded-full bg-tertiary/20 blur-[80px]"></div>
+          {/* Subtle accent rather than loud blurry circles */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-tertiary to-primary"></div>
           
           <div className="relative z-10 max-w-3xl mx-auto">
             <h2 className="font-display text-[48px] text-white mb-lg leading-tight">Host your next big idea with Eventnic.</h2>
@@ -299,10 +276,10 @@ export default function HomeEventnic() {
               Join thousands of organizers who have upgraded their event management experience. From ticket sales to final payout, we handle the heavy lifting.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-md">
-              <button onClick={() => navigate('/create-event/basic-info')} className="bg-white text-primary font-bold font-headline-sm px-[40px] py-[16px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all w-full sm:w-auto glow-primary">
+              <button onClick={() => navigate('/create-event/basic-info')} className="bg-surface text-primary font-bold font-headline-sm px-[40px] py-[16px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all w-full sm:w-auto glow-primary">
                 Get Started Free
               </button>
-              <button onClick={() => navigate('/contact')} className="glass-panel text-white font-bold font-headline-sm px-[40px] py-[16px] rounded-full hover:bg-white/10 transition-all w-full sm:w-auto border border-white/30">
+              <button onClick={() => navigate('/contact')} className="bg-transparent text-white font-bold font-headline-sm px-[40px] py-[16px] rounded-full hover:bg-white/10 transition-all w-full sm:w-auto border border-white/30">
                 Talk to Sales
               </button>
             </div>

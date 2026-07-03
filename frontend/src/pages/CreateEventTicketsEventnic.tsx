@@ -59,9 +59,9 @@ export default function CreateEventTicketsEventnic() {
                   <input value={t.name} onChange={(e) => updateTier(t.id, 'name', e.target.value)} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="e.g. Early Bird" type="text" />
                 </div>
                 <div className="md:col-span-3">
-                  <label className="block font-label-md text-label-md text-on-surface-variant mb-base">Price ($)</label>
+                  <label className="block font-label-md text-label-md text-on-surface-variant mb-base">Price (GH₵)</label>
                   <div className="relative">
-                    <span className="absolute left-md top-1/2 -translate-y-1/2 text-secondary font-body-md">$</span>
+                    <span className="absolute left-md top-1/2 -translate-y-1/2 text-secondary font-body-md">₵</span>
                     <input value={t.price} onChange={(e) => updateTier(t.id, 'price', e.target.value)} className="w-full h-11 pl-xl pr-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="0.00" type="number" min="0" />
                   </div>
                 </div>
@@ -86,14 +86,12 @@ export default function CreateEventTicketsEventnic() {
           </button>
         </div>
 
-        <div className="mt-xxl flex items-center justify-between pt-lg border-t border-outline-variant">
-          <button onClick={handleBack} className="flex items-center gap-sm px-lg py-md border border-outline-variant rounded-lg text-secondary font-bold hover:bg-surface-container-low transition-all">
-            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
-            Back
+        <div className="flex justify-between items-center pt-xl border-t border-outline-variant mt-xl">
+          <button onClick={handleBack} className="btn-outline">
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span> Back
           </button>
-          <button onClick={handleContinue} className="flex items-center gap-sm px-xl py-md bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
-            Continue
-            <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+          <button onClick={handleContinue} className="btn-primary">
+            Continue <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
           </button>
         </div>
       </div>

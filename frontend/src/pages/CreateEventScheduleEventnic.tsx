@@ -76,16 +76,14 @@ export default function CreateEventScheduleEventnic() {
             </button>
           </div>
 
-          <div className="mt-xxl flex items-center justify-between">
-            <button onClick={handleBack} className="flex items-center gap-sm px-lg py-md border border-outline-variant rounded-lg text-secondary font-bold hover:bg-surface-container-low transition-all">
-              <span className="material-symbols-outlined text-[20px]">arrow_back</span>
-              Back to Tickets
-            </button>
-            <button onClick={handleContinue} className="flex items-center gap-sm px-xl py-md bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
-              Continue
-              <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
-            </button>
-          </div>
+          <div className="flex justify-between items-center pt-xl border-t border-outline-variant mt-xl">
+          <button onClick={handleBack} className="btn-outline">
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span> Back
+          </button>
+          <button onClick={handleContinue} className="btn-primary">
+            Continue <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+          </button>
+        </div>
         </div>
 
         <div className="lg:col-span-5">
@@ -105,10 +103,10 @@ export default function CreateEventScheduleEventnic() {
                 )}
                 {agenda.map((a) => (
                   <div key={a.id} className="relative pl-xl group">
-                    <div className="absolute left-0 top-1 w-[32px] h-[32px] bg-white border-2 border-primary rounded-full flex items-center justify-center z-10 shadow-sm">
+                    <div className="absolute left-0 top-1 w-[32px] h-[32px] bg-surface border-2 border-primary rounded-full flex items-center justify-center z-10 shadow-sm">
                       <span className="w-2 h-2 bg-primary rounded-full"></span>
                     </div>
-                    <div className="bg-white p-md rounded-lg border border-outline-variant group-hover:border-primary transition-colors shadow-sm">
+                    <div className="bg-surface p-md rounded-lg border border-outline-variant group-hover:border-primary transition-colors shadow-sm">
                       <div className="flex justify-between items-start mb-xs">
                         <h4 className="font-label-md text-label-md text-on-surface">{a.title}</h4>
                         <button onClick={() => removeItem(a.id)} className="text-on-surface-variant hover:text-error transition-colors">

@@ -210,14 +210,13 @@ export default function CreateEventReviewEventnic() {
                 <p className="text-on-surface-variant">By submitting, you agree to Eventnic's <Link className="text-primary underline" to="/terms-of-service">Terms of Service</Link> and <Link className="text-primary underline" to="/privacy-policy">Privacy Policy</Link>.</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-md pt-md border-t border-outline-variant">
-              <button type="button" onClick={handleBack} className="w-full sm:w-auto px-xl py-md border border-outline-variant bg-surface text-on-surface font-label-md rounded-lg hover:bg-surface-container transition-all flex items-center justify-center gap-sm">
-                <span className="material-symbols-outlined">arrow_back</span>
-                Back to Schedule
+            <div className="mt-xl flex flex-col sm:flex-row items-center justify-end gap-md">
+              <button type="button" onClick={handleBack} className="btn-outline w-full sm:w-auto">
+                <span className="material-symbols-outlined text-[20px]">arrow_back</span> Back to Schedule
               </button>
-              <button type="button" onClick={handlePublish} className="w-full sm:w-auto px-xxl py-md bg-primary text-on-primary font-headline-sm rounded-lg shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-md">
-                Submit Event
-                <span className="material-symbols-outlined">rocket_launch</span>
+              <button type="button" onClick={handlePublish} className="btn-primary w-full sm:w-auto px-xxl" disabled={isPublishing}>
+                {isPublishing ? 'Publishing...' : 'Publish Event'}
+                <span className="material-symbols-outlined text-[20px]">rocket_launch</span>
               </button>
             </div>
           </div>

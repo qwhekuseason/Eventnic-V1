@@ -1,24 +1,70 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { useEvents } from '../../contexts/EventsContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function OrganizerEmailBroadcasts() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [targetAudience, setTargetAudience] = useState('all_attendees');
   const [isSending, setIsSending] = useState(false);
-  const [sentStatus, setSentStatus] = useState<null | 'success'>(null);
+  const [sentStatus, setSentStatus] = useState<null | 'success' | 'error'>(null);
+  
+  const { user } = useAuth();
+  const { events } = useEvents();
+  const [eventId, setEventId] = useState('');
 
-  const handleSend = (e: React.FormEvent) => {
+  // Get first event as default if not selected
+  const organizerEvents = events.filter(e => e.organizerEmail === user?.email);
+  if (!eventId && organizerEvents.length > 0) {
+    setEventId(organizerEvents[0].id);
+  }
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!eventId) {
+      alert("Please select an event");
+      return;
+    }
+    
     setIsSending(true);
-    // Simulate sending
-    setTimeout(() => {
-      setIsSending(false);
+    setSentStatus(null);
+    
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const token = user ? await user.getIdToken() : '';
+      
+      const res = await fetch('http://localhost:5000/api/broadcasts/send', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          eventId,
+          subject,
+          message,
+          targetAudience
+        })
+      });
+      
+      if (!res.ok) {
+        throw new Error('Failed to send broadcast');
+      }
+
       setSentStatus('success');
       setSubject('');
       setMessage('');
       setTimeout(() => setSentStatus(null), 3000);
-    }, 1500);
+    } catch (e) {
+      console.error(e);
+      setSentStatus('error');
+      setTimeout(() => setSentStatus(null), 3000);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -40,13 +86,33 @@ export default function OrganizerEmailBroadcasts() {
           <div className="lg:col-span-2">
             <div className="bg-surface rounded-2xl border border-outline-variant shadow-sm p-lg md:p-xl">
               {sentStatus === 'success' && (
-                <div className="mb-lg p-md bg-green-50 text-green-800 rounded-xl border border-green-200 flex items-center gap-sm">
-                  <span className="material-symbols-outlined text-green-600">check_circle</span>
+                <div className="mb-lg p-md bg-emerald-500/10 text-green-800 rounded-xl border border-emerald-500/30 flex items-center gap-sm">
+                  <span className="material-symbols-outlined text-emerald-600 dark:text-emerald-400">check_circle</span>
                   <span className="font-bold">Broadcast sent successfully!</span>
+                </div>
+              )}
+              {sentStatus === 'error' && (
+                <div className="mb-lg p-md bg-red-500/10 text-red-800 rounded-xl border border-red-500/30 flex items-center gap-sm">
+                  <span className="material-symbols-outlined text-red-600 dark:text-red-400">error</span>
+                  <span className="font-bold">Error sending broadcast. Ensure you have attendees.</span>
                 </div>
               )}
 
               <form onSubmit={handleSend} className="space-y-lg">
+                <div>
+                  <label className="block text-on-surface font-bold font-label-md mb-xs">Select Event</label>
+                  <select 
+                    value={eventId} 
+                    onChange={(e) => setEventId(e.target.value)}
+                    className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl p-md text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="" disabled>Select an event</option>
+                    {organizerEvents.map(e => (
+                      <option key={e.id} value={e.id}>{e.title}</option>
+                    ))}
+                  </select>
+                </div>
+                
                 <div>
                   <label className="block text-on-surface font-bold font-label-md mb-xs">Target Audience</label>
                   <select 

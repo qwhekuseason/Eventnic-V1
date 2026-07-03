@@ -76,7 +76,7 @@ export default function MarketplaceListingManager() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-on-surface mb-xs">Starting Price ($)</label>
+                  <label className="block text-sm font-bold text-on-surface mb-xs">Starting Price (GH₵)</label>
                   <input required type="number" min="0" className="w-full bg-background border border-outline-variant rounded-xl p-sm outline-none focus:border-primary" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
                 </div>
                 <div>
@@ -105,14 +105,14 @@ export default function MarketplaceListingManager() {
             <div key={listing.id} className="bg-surface border border-outline-variant rounded-2xl p-md flex flex-col shadow-sm">
               <div className="flex justify-between items-start mb-sm">
                 <span className="text-xs font-bold text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full">{listing.category}</span>
-                <button onClick={() => { if(window.confirm('Delete this listing?')) deleteListing(listing.id); }} className="text-red-500 hover:text-red-700">
+                <button onClick={() => { if(window.confirm('Delete this listing?')) deleteListing(listing.id); }} className="text-error hover:text-on-error-container">
                   <span className="material-symbols-outlined text-[20px]">delete</span>
                 </button>
               </div>
               <h3 className="font-bold text-on-surface text-lg mb-xs">{listing.title}</h3>
               <p className="text-secondary text-sm mb-md flex-1">{listing.description}</p>
               <div className="pt-sm border-t border-outline-variant flex justify-between items-center text-sm font-bold">
-                <span>${listing.price.toLocaleString()}</span>
+                <span>GH₵ {listing.price.toLocaleString()}</span>
                 <span className="text-secondary">{listing.location}</span>
               </div>
             </div>

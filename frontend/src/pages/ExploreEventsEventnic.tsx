@@ -12,7 +12,7 @@ const priceLabel = (e) => {
   const prices = e.ticketTiers.map((t) => Number(t.price)).filter((p) => p > 0);
   if (prices.length === 0) return 'Free';
   const min = Math.min(...prices);
-  return e.ticketTiers.length > 1 ? `From $${min.toLocaleString()}` : `$${min.toLocaleString()}`;
+  return e.ticketTiers.length > 1 ? `From GH₵ ${min.toLocaleString()}` : `GH₵ ${min.toLocaleString()}`;
 };
 
 export default function ExploreEventsEventnic() {
@@ -32,7 +32,7 @@ export default function ExploreEventsEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero Banner */}
-      <section className="relative pt-[160px] pb-[80px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[80px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[600px] h-[600px] rounded-full bg-tertiary/20 blur-[120px]" />
           <div className="absolute bottom-0 -left-[10%] w-[500px] h-[500px] rounded-full bg-primary/30 blur-[100px]" />
@@ -40,7 +40,7 @@ export default function ExploreEventsEventnic() {
         <div className="max-w-container-max mx-auto px-margin relative z-10 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <h1 className="font-display text-[48px] md:text-[64px] leading-[1.1] text-white tracking-tight mb-md">
-              Explore <span className="text-transparent bg-clip-text text-gradient-animated">Events</span>
+              Explore <span className="text-primary">Events</span>
             </h1>
             <p className="font-body-lg text-[18px] text-white/70 max-w-[640px] mx-auto mb-xl">
               Discover conferences, festivals, workshops and more happening around the world.
@@ -52,7 +52,7 @@ export default function ExploreEventsEventnic() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search events by name, location, or category..."
-                className="flex-grow bg-transparent border-none outline-none text-white placeholder-white/50 font-body-md py-sm"
+                className="flex-grow !bg-transparent border-none outline-none !text-white placeholder-white/50 font-body-md py-sm"
               />
               {query && (
                 <button onClick={() => setQuery('')} className="text-white/50 hover:text-white mr-md flex items-center">
@@ -106,8 +106,8 @@ export default function ExploreEventsEventnic() {
                 <span className="material-symbols-outlined text-[48px] text-primary">event_busy</span>
               </div>
               <h2 className="font-display text-[32px] text-on-surface mb-sm">No events found</h2>
-              <p className="font-body-lg mb-lg max-w-sm mx-auto">We couldn't find any events matching your current filters. Try adjusting your search.</p>
-              <button onClick={() => { setQuery(''); setCategory('All'); }} className="bg-surface-container-high text-on-surface hover:bg-surface-variant px-lg py-sm rounded-full font-bold transition-colors border border-outline-variant">
+              <p className="font-body-lg mb-lg max-w-[384px] mx-auto">We couldn't find any events matching your current filters. Try adjusting your search.</p>
+              <button onClick={() => { setQuery(''); setCategory('All'); }} className="btn-outline w-fit mx-auto rounded-full">
                 Clear Filters
               </button>
             </motion.div>
@@ -121,7 +121,7 @@ export default function ExploreEventsEventnic() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.05 }}
                   onClick={() => navigate(`/event/${event.slug}`)}
-                  className="card-hover group bg-white rounded-[24px] overflow-hidden border border-outline-variant cursor-pointer flex flex-col h-full"
+                  className="card-hover group bg-surface rounded-[24px] overflow-hidden border border-outline-variant cursor-pointer flex flex-col h-full"
                 >
                   <div className="h-[220px] relative overflow-hidden bg-surface-variant flex-shrink-0">
                     {event.coverImage ? (
@@ -136,7 +136,7 @@ export default function ExploreEventsEventnic() {
                     <div className="absolute top-4 left-4 glass-panel text-white px-sm py-xs rounded-lg font-bold text-sm backdrop-blur-md">
                       {event.date || 'TBA'}
                     </div>
-                    <div className="absolute top-4 right-4 bg-white text-on-surface px-sm py-xs rounded-full font-bold text-sm shadow-md">
+                    <div className="absolute top-4 right-4 bg-surface text-on-surface px-sm py-xs rounded-full font-bold text-sm shadow-md">
                       {priceLabel(event)}
                     </div>
                   </div>

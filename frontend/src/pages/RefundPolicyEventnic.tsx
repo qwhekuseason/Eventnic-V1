@@ -4,7 +4,7 @@ export default function RefundPolicyEventnic() {
   return (
     <main className="bg-background min-h-screen">
       {/* Hero */}
-      <section className="relative pt-[160px] pb-[60px] overflow-hidden bg-gradient-dark">
+      <section className="relative pt-[160px] pb-[60px] overflow-hidden hero-section">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] left-[20%] w-[500px] h-[500px] rounded-full bg-primary/15 blur-[120px]" />
         </div>
@@ -20,7 +20,7 @@ export default function RefundPolicyEventnic() {
         <div className="max-w-3xl mx-auto px-margin">
           <article className="prose max-w-none space-y-xl text-on-surface">
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">1. General Overview</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>Eventnic operates as a ticketing platform connecting event organizers with attendees. As a third-party platform, Eventnic does not set the refund policies for individual events; these are established and enforced directly by the Event Organizers.</p>
@@ -28,7 +28,7 @@ export default function RefundPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">2. Standard Refund Conditions</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>While organizers determine their own policies, most conform to the following standard conditions:</p>
@@ -40,7 +40,7 @@ export default function RefundPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">3. How to Request a Refund</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>To request a refund for an upcoming event:</p>
@@ -54,7 +54,7 @@ export default function RefundPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">4. Automated Refund Handling (For Organizers)</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>Eventnic provides tools for organizers to issue refunds seamlessly. When an organizer issues a refund:</p>
@@ -66,14 +66,14 @@ export default function RefundPolicyEventnic() {
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">5. Disputed Charges & Chargebacks</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>If you have an issue with your ticket, we strongly encourage you to contact the organizer or Eventnic Support before filing a chargeback with your bank. Fraudulent chargebacks may result in immediate suspension of your Eventnic account and cancellation of any future event tickets.</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-[20px] border border-outline-variant shadow-sm p-xl">
+            <div className="bg-surface rounded-[20px] border border-outline-variant shadow-sm p-xl">
               <h2 className="font-headline-md text-headline-md text-primary mb-md">6. Contact Support</h2>
               <div className="text-secondary font-body-md space-y-md">
                 <p>If you cannot reach an organizer or suspect an event is fraudulent, please contact our Trust & Safety team immediately:</p>

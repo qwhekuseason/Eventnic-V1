@@ -4,7 +4,7 @@ import { useEvents, eventRevenue } from '../../contexts/EventsContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const money = (n: number) => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+const money = (n: number) => 'GH₵ ' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
                 <span className="material-symbols-outlined text-[18px] text-emerald-500">confirmation_number</span> Tickets Sold
               </span>
               <span className="font-display text-[36px] text-on-surface">{totals.ticketsSold.toLocaleString()}</span>
-              <span className="text-emerald-600 font-body-sm mt-xs font-medium bg-emerald-50 px-sm py-1 rounded-full w-fit">
+              <span className="text-emerald-600 font-body-sm mt-xs font-medium bg-emerald-500/10 px-sm py-1 rounded-full w-fit">
                 across all events
               </span>
             </div>
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
                             initial={{ width: 0 }}
                             animate={{ width: `${pct}%` }}
                             transition={{ duration: 1, delay: 0.5 + (idx * 0.1), ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-primary to-tertiary rounded-full relative overflow-hidden"
+                            className="h-full bg-primary text-white rounded-full relative overflow-hidden"
                           >
                             <div className="absolute inset-0 w-full h-full animate-shimmer opacity-30"></div>
                           </motion.div>
