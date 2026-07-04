@@ -19,6 +19,12 @@ dotenv.config();
 
 const app = express();
 
+app.set('trust proxy', 1);
+
+app.get('/', (req, res) => {
+  res.send('Eventnic Backend API is running successfully!');
+});
+
 // Middleware
 app.use(helmet());
 app.use(
@@ -45,6 +51,7 @@ app.use(
 app.use(express.json());
 
 // Rate limiting
+app.set('trust proxy', 1);
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)

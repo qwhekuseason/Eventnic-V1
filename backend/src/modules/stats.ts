@@ -37,6 +37,9 @@ export const getStats = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error) {
     console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch stats' });
+    res.status(500).json({
+      error: 'Failed to fetch stats',
+      details: error instanceof Error ? error.message : String(error),
+    });
   }
 };
