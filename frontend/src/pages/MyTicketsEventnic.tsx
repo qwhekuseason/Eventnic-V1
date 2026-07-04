@@ -56,13 +56,13 @@ export default function MyTicketsEventnic() {
   const past = tickets.filter(t => t.status !== 'valid'); // checked_in or cancelled
 
   return (
-    <main className="max-w-container-max mx-auto px-margin pt-[120px] pb-xxl">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-lg mb-xxl">
-        <div>
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-[120px] pb-xxl">
+      <header className="flex flex-col gap-6 md:flex-row md:items-end justify-between mb-16">
+        <div className="max-w-2xl">
           <h1 className="font-headline-lg text-headline-lg text-on-surface">My Tickets</h1>
-          <p className="font-body-md text-secondary mt-xs">View and manage your purchased event tickets.</p>
+          <p className="font-body-md text-secondary mt-3 leading-7">View and manage your purchased event tickets with better readability and mobile-friendly layout.</p>
         </div>
-        <button onClick={() => navigate('/explore')} className="flex items-center justify-center gap-sm bg-primary text-on-primary px-xl h-[48px] rounded-xl font-bold shadow-md hover:shadow-lg cursor-pointer transition-all active:scale-[0.98]">
+        <button onClick={() => navigate('/explore')} className="inline-flex items-center justify-center gap-2 bg-primary text-on-primary px-5 py-3 rounded-2xl font-bold shadow-md hover:shadow-lg transition-all active:scale-[0.98]">
           <span className="material-symbols-outlined">explore</span>
           <span className="font-label-md">Browse Events</span>
         </button>
@@ -82,7 +82,7 @@ export default function MyTicketsEventnic() {
             {upcoming.length === 0 ? (
               <p className="text-secondary text-body-lg p-xl bg-surface rounded-[20px] border border-outline-variant text-center">You have no upcoming tickets.</p>
             ) : (
-              <div className="space-y-lg">
+              <div className="grid gap-6">
                 {upcoming.map((ticket, i) => (
                   <motion.div
                     key={ticket.id}
@@ -91,27 +91,42 @@ export default function MyTicketsEventnic() {
                     transition={{ duration: 0.4, delay: i * 0.1 }}
                     className="bg-surface rounded-[20px] border border-outline-variant shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
                   >
-                    <div className="flex flex-col md:flex-row">
-                      <div className="md:w-[240px] h-[180px] md:h-auto overflow-hidden flex-shrink-0">
+                    <div className="flex flex-col gap-4 md:flex-row md:gap-0">
+                      <div className="md:w-[260px] h-[180px] md:h-auto overflow-hidden flex-shrink-0">
                         <img src={ticket.eventImg} alt={ticket.eventName} className="w-full h-full object-cover" />
                       </div>
-                      <div className="flex-grow p-xl flex flex-col md:flex-row md:items-center md:justify-between gap-lg">
-                        <div className="flex-grow">
-                          <div className="flex items-center gap-sm mb-sm">
-                            <span className="px-sm py-xs rounded-full bg-green-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 font-label-sm text-label-sm border border-emerald-500/30">Confirmed</span>
-                            <span className="text-secondary font-body-sm">{ticket.id.substring(0,8).toUpperCase()}</span>
+                      <div className="flex flex-col flex-1 p-6 md:p-8 gap-6 min-w-0">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap gap-2 items-center mb-2">
+                              <span className="inline-flex items-center rounded-full bg-green-100 text-emerald-700 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em]">Confirmed</span>
+                              <span className="text-secondary text-sm font-medium break-all">{ticket.id.substring(0, 8).toUpperCase()}</span>
+                            </div>
+                            <h3 className="font-headline-sm font-bold text-on-surface mb-2 break-words">{ticket.eventName}</h3>
                           </div>
-                          <h3 className="font-headline-sm font-bold text-on-surface mb-xs">{ticket.eventName}</h3>
-                          <div className="flex flex-wrap gap-lg text-secondary font-body-sm">
-                            <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[16px]">calendar_today</span> {ticket.eventDate}</span>
-                            <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[16px]">location_on</span> {ticket.eventLocation}</span>
-                            <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[16px]">confirmation_number</span> {ticket.tierName}</span>
-                          </div>
-                        </div>
-                        <div className="flex flex-row md:flex-col gap-sm flex-shrink-0">
-                          <button onClick={() => setSelectedTicket(ticket)} className="px-lg py-sm bg-primary text-on-primary rounded-xl font-label-md font-bold hover:opacity-90 transition-all flex items-center gap-xs cursor-pointer">
-                            <span className="material-symbols-outlined text-[18px]">qr_code_2</span> View Ticket
+                          <button onClick={() => setSelectedTicket(ticket)} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-on-primary transition hover:opacity-90">
+                            <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
+                            View Ticket
                           </button>
+                        </div>
+
+                        <div className="grid gap-3 sm:grid-cols-2 text-secondary text-sm leading-6">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">calendar_today</span>
+                            <span>{ticket.eventDate || 'Date TBA'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">location_on</span>
+                            <span>{ticket.eventLocation || 'Location TBA'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">confirmation_number</span>
+                            <span>{ticket.tierName}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">person</span>
+                            <span>{ticket.attendeeName || '1 ticket'}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -127,9 +142,9 @@ export default function MyTicketsEventnic() {
               <span className="material-symbols-outlined text-secondary">history</span> Past/Checked-In ({past.length})
             </h2>
             {past.length === 0 ? (
-              <p className="text-secondary text-body-lg p-xl bg-surface rounded-[20px] border border-outline-variant text-center">No past tickets found.</p>
+              <p className="text-secondary text-body-lg p-8 bg-surface rounded-[20px] border border-outline-variant text-center">No past tickets found.</p>
             ) : (
-              <div className="space-y-lg">
+              <div className="grid gap-6">
                 {past.map((ticket) => (
                   <motion.div
                     key={ticket.id}
@@ -137,20 +152,33 @@ export default function MyTicketsEventnic() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4 }}
-                    className="bg-surface-container-low rounded-[20px] border border-outline-variant shadow-sm overflow-hidden opacity-80"
+                    className="bg-surface-container-low rounded-[20px] border border-outline-variant shadow-sm overflow-hidden opacity-90"
                   >
-                    <div className="flex flex-col md:flex-row">
-                      <div className="md:w-[200px] h-[140px] md:h-auto overflow-hidden flex-shrink-0 grayscale">
+                    <div className="flex flex-col gap-4 md:flex-row md:gap-0">
+                      <div className="md:w-[240px] h-[160px] md:h-auto overflow-hidden flex-shrink-0 grayscale">
                         <img src={ticket.eventImg} alt={ticket.eventName} className="w-full h-full object-cover" />
                       </div>
-                      <div className="flex-grow p-xl flex flex-col md:flex-row md:items-center md:justify-between gap-lg">
-                        <div>
-                          <div className="flex items-center gap-sm mb-sm">
-                            <span className="px-sm py-xs rounded-full bg-surface-container-highest text-secondary font-label-sm text-label-sm uppercase">{ticket.status.replace('_', ' ')}</span>
-                            <span className="text-secondary font-body-sm">{ticket.id.substring(0,8).toUpperCase()}</span>
+                      <div className="flex flex-col justify-between flex-1 p-6 md:p-8 gap-4 min-w-0">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap gap-2 items-center mb-2">
+                              <span className="inline-flex items-center rounded-full bg-surface-container-highest text-secondary px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.08em]">
+                                {ticket.status.replace('_', ' ')}
+                              </span>
+                              <span className="text-secondary text-sm font-medium break-all">{ticket.id.substring(0, 8).toUpperCase()}</span>
+                            </div>
+                            <h3 className="font-headline-sm font-bold text-on-surface mb-1 break-words">{ticket.eventName}</h3>
                           </div>
-                          <h3 className="font-headline-sm font-bold text-on-surface mb-xs">{ticket.eventName}</h3>
-                          <p className="text-secondary font-body-sm flex items-center gap-xs"><span className="material-symbols-outlined text-[16px]">calendar_today</span> {ticket.eventDate}</p>
+                        </div>
+                        <div className="grid gap-3 sm:grid-cols-2 text-secondary text-sm leading-6">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">calendar_today</span>
+                            <span>{ticket.eventDate || 'Date TBA'}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[18px]">location_on</span>
+                            <span>{ticket.eventLocation || 'Location TBA'}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -184,7 +212,7 @@ export default function MyTicketsEventnic() {
                 <p className="text-secondary font-body-md mt-xs">{selectedTicket.tierName}</p>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl mx-auto w-fit mb-xl flex items-center justify-center border border-outline-variant shadow-sm">
+              <div className="bg-white p-6 rounded-2xl mx-auto w-full max-w-[320px] mb-10 flex items-center justify-center border border-outline-variant shadow-sm">
                 <QRCodeSVG 
                   value={selectedTicket.id} 
                   size={200}
@@ -193,9 +221,9 @@ export default function MyTicketsEventnic() {
                 />
               </div>
 
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-3">
                 <p className="font-label-md text-secondary">TICKET ID</p>
-                <p className="font-headline-md font-mono font-bold tracking-wider text-on-surface bg-surface-container py-sm rounded-lg">
+                <p className="font-headline-md font-mono font-bold tracking-wider text-on-surface bg-surface-container py-3 px-4 rounded-xl break-all">
                   {selectedTicket.id.substring(0, 8).toUpperCase()}
                 </p>
               </div>

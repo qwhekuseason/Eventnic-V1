@@ -36,13 +36,14 @@ export default function HomeEventnic() {
     let cancelled = false;
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/stats`);
-        if (!res.ok) throw new Error('Failed to fetch stats');
+        const url = `${apiBaseUrl}/api/stats`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to fetch stats from ${url} (${res.status})`);
         const data = await res.json();
         if (!cancelled) setStats(data);
       } catch (err: any) {
         console.error('Error fetching stats', err);
-        if (!cancelled) setStatsError(err.message || 'Error');
+        if (!cancelled) setStatsError(err.message || 'Error fetching statistics');
       }
     };
     fetchStats();

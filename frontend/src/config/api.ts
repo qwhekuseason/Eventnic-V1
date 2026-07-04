@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_URL || 'https://eventnic-v1.onrender.com';
 const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 const randomString = (length = 8): string => {
