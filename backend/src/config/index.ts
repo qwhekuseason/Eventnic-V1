@@ -9,7 +9,9 @@ const toNumber = (value: string | undefined, fallback: number) => {
 };
 
 const parseCorsOrigin = (value: string | undefined) => {
-  if (!value) return ['http://localhost:5173'];
+  if (!value) {
+    return ['http://localhost:5173', 'https://eventnic-v1-nw.vercel.app'];
+  }
   return value.split(',').map((item) => item.trim()).filter(Boolean);
 };
 

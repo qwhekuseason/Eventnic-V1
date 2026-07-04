@@ -23,7 +23,21 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: config.corsOrigin,
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      if (Array.isArray(config.corsOrigin) && config.corsOrigin.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      if (origin.endsWith('.vercel.app')) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: false,
     optionsSuccessStatus: 200,
   }),
