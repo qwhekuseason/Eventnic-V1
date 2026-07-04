@@ -19,6 +19,7 @@ export default function AttendeeListOrdersEventnic() {
         const eventIds = myEvents.map(e => e.id);
         
         if (eventIds.length === 0) {
+          setAttendees([]);
           setLoading(false);
           return;
         }
@@ -44,7 +45,7 @@ export default function AttendeeListOrdersEventnic() {
       }
     }
     fetchAttendees();
-  }, [user]);
+  }, [user, getEventsByOrganizer, db]);
 
   return (
     <main className="max-w-container-max mx-auto px-margin pt-[120px] pb-xxl">
@@ -65,7 +66,7 @@ export default function AttendeeListOrdersEventnic() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-surface-container-lowest text-secondary uppercase font-label-sm tracking-wider text-label-sm">
-                  <th className="px-lg py-md border-b border-outline-variant font-semibold">Attendee ID</th>
+                  <th className="px-lg py-md border-b border-outline-variant font-semibold">Attendee</th>
                   <th className="px-lg py-md border-b border-outline-variant font-semibold">Event</th>
                   <th className="px-lg py-md border-b border-outline-variant font-semibold">Order Date</th>
                   <th className="px-lg py-md border-b border-outline-variant font-semibold">Status</th>
@@ -74,10 +75,11 @@ export default function AttendeeListOrdersEventnic() {
               <tbody className="divide-y divide-outline-variant">
                 {attendees.map((ticket) => {
                   const evt = getEvent(ticket.eventId);
+                  const attendeeName = ticket.attendeeName || ticket.userId || 'Guest';
                   return (
                     <tr key={ticket.id} className="hover:bg-surface-bright transition-colors group">
                       <td className="px-lg py-lg">
-                        <div className="font-headline-sm text-body-md text-on-surface">{ticket.userId.slice(0, 8)}</div>
+                        <div className="font-headline-sm text-body-md text-on-surface">{attendeeName}</div>
                         <div className="text-body-sm text-secondary">Ticket: {ticket.id}</div>
                       </td>
                       <td className="px-lg py-lg">

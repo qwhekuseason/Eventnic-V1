@@ -1,14 +1,17 @@
 // @ts-nocheck
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useEvents, eventSold, eventCapacity, eventRevenue, eventSoldPct, eventTotalVotes, eventVotingRevenue, eventTotalRevenue } from '../contexts/EventsContext';
+import { useNominations } from '../contexts/NominationsContext';
+import EventNominationsTab from '../components/EventNominationsTab';
 
 const money = (n) => 'GH₵ ' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
 export default function EventOverviewAnalyticsEventnic() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { getEvent, getPublishedEvents } = useEvents();
+  const { getEvent, getPublishedEvents, getEventsByOrganizer, updateEvent } = useEvents();
+  const { nominations } = useNominations();
   const [activeTab, setActiveTab] = useState('Overview');
 
   const eventId = params.get('event');
@@ -35,6 +38,10 @@ export default function EventOverviewAnalyticsEventnic() {
   const voteRev = eventVotingRevenue(event);
   const totalRev = eventTotalRevenue(event);
 
+  // Nomination counts for badge
+  const eventNominations = nominations.filter(n => n.eventId === event.id);
+  const pendingNominations = eventNominations.filter(n => n.status === 'pending').length;
+
   const exportCsv = () => {
     const rows = [['Tier', 'Price', 'Sold', 'Quantity', 'Revenue']];
     event.ticketTiers.forEach((t) => rows.push([t.name, t.price, t.sold, t.quantity, t.sold * t.price]));
@@ -47,10 +54,17 @@ export default function EventOverviewAnalyticsEventnic() {
     URL.revokeObjectURL(a.href);
   };
 
-  const tabs = ['Overview', 'Ticketing', 'Voting'];
+  const tabs = [
+    { key: 'Overview', icon: 'dashboard', badge: 0 },
+    { key: 'Ticketing', icon: 'confirmation_number', badge: 0 },
+    { key: 'Voting', icon: 'how_to_vote', badge: 0 },
+    { key: 'Nominations', icon: 'person_add', badge: pendingNominations },
+    { key: 'Event Details', icon: 'info', badge: 0 },
+  ];
 
   return (
     <main className="max-w-container-max mx-auto px-margin pt-[120px] pb-xxl">
+      {/* ── Header ── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-lg mb-xl">
         <div className="flex flex-col gap-xs">
           <nav className="flex items-center gap-xs text-secondary font-label-sm text-label-sm">
@@ -61,7 +75,7 @@ export default function EventOverviewAnalyticsEventnic() {
           <h1 className="font-headline-lg text-headline-lg text-on-surface">{event.title}</h1>
           <p className="text-secondary font-body-md text-body-md">{[event.location, event.date].filter(Boolean).join(' • ') || '—'}</p>
         </div>
-        <div className="flex items-center gap-md">
+        <div className="flex items-center gap-md flex-wrap">
           {event.votingEnabled && (
             <button
               onClick={() => {
@@ -83,18 +97,24 @@ export default function EventOverviewAnalyticsEventnic() {
         </div>
       </div>
 
-      <div className="flex border-b border-outline-variant mb-xl gap-xl">
+      {/* ── Tab Navigation ── */}
+      <div className="flex border-b border-outline-variant mb-xl gap-md overflow-x-auto">
         {tabs.map(t => (
           <button 
-            key={t} 
-            onClick={() => setActiveTab(t)} 
-            className={`pb-sm font-label-md transition-all border-b-2 px-xs ${activeTab === t ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-on-surface'}`}
+            key={t.key} 
+            onClick={() => setActiveTab(t.key)} 
+            className={`pb-sm font-label-md transition-all border-b-2 px-sm flex items-center gap-xs whitespace-nowrap ${activeTab === t.key ? 'border-primary text-primary' : 'border-transparent text-secondary hover:text-on-surface'}`}
           >
-            {t} Analytics
+            <span className="material-symbols-outlined text-[18px]">{t.icon}</span>
+            {t.key}
+            {t.badge > 0 && (
+              <span className="bg-error text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">{t.badge}</span>
+            )}
           </button>
         ))}
       </div>
 
+      {/* ── Overview Tab ── */}
       {activeTab === 'Overview' && (
         <div className="space-y-xl">
           {sold === 0 && (
@@ -124,9 +144,42 @@ export default function EventOverviewAnalyticsEventnic() {
               <p className="text-secondary font-body-sm text-body-sm mt-xs">{event.votingEnabled ? 'Across all categories' : 'Voting disabled'}</p>
             </div>
           </div>
+
+          {/* Quick Links */}
+          <div className="bg-surface border border-outline-variant rounded-2xl p-xl shadow-sm">
+            <h3 className="font-headline-sm text-on-surface mb-lg">Quick Actions</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-md">
+              <button onClick={() => setActiveTab('Nominations')} className="flex flex-col items-center gap-sm p-lg rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary hover:shadow-md transition-all group">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors text-primary">
+                  <span className="material-symbols-outlined">person_add</span>
+                </div>
+                <span className="font-label-md text-on-surface text-center">Nominations</span>
+                {pendingNominations > 0 && <span className="bg-error text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{pendingNominations} pending</span>}
+              </button>
+              <button onClick={() => setActiveTab('Ticketing')} className="flex flex-col items-center gap-sm p-lg rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary hover:shadow-md transition-all group">
+                <div className="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center group-hover:bg-tertiary group-hover:text-white transition-colors text-tertiary">
+                  <span className="material-symbols-outlined">confirmation_number</span>
+                </div>
+                <span className="font-label-md text-on-surface text-center">Ticketing</span>
+              </button>
+              <button onClick={() => setActiveTab('Voting')} className="flex flex-col items-center gap-sm p-lg rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary hover:shadow-md transition-all group">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors text-emerald-500">
+                  <span className="material-symbols-outlined">how_to_vote</span>
+                </div>
+                <span className="font-label-md text-on-surface text-center">Voting Results</span>
+              </button>
+              <button onClick={() => setActiveTab('Event Details')} className="flex flex-col items-center gap-sm p-lg rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary hover:shadow-md transition-all group">
+                <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors text-amber-500">
+                  <span className="material-symbols-outlined">info</span>
+                </div>
+                <span className="font-label-md text-on-surface text-center">Event Details</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
+      {/* ── Ticketing Tab ── */}
       {activeTab === 'Ticketing' && (
         <div className="space-y-xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
@@ -199,6 +252,7 @@ export default function EventOverviewAnalyticsEventnic() {
         </div>
       )}
 
+      {/* ── Voting Tab ── */}
       {activeTab === 'Voting' && (
         <div className="space-y-xl">
           {!event.votingEnabled ? (
@@ -266,6 +320,236 @@ export default function EventOverviewAnalyticsEventnic() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Nominations Tab ── */}
+      {activeTab === 'Nominations' && (
+        <EventNominationsTab eventId={event.id} />
+      )}
+
+      {/* ── Event Details Tab ── */}
+      {activeTab === 'Event Details' && (
+        <div className="space-y-xl">
+          {/* Event Info Card */}
+          <div className="bg-surface border border-outline-variant rounded-2xl shadow-sm overflow-hidden">
+            {/* Cover Image */}
+            {event.coverImage && (
+              <div className="w-full h-48 md:h-64 overflow-hidden">
+                <img src={event.coverImage} alt={event.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div className="p-xl">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-lg mb-xl">
+                <div>
+                  <h2 className="font-display text-[32px] text-on-surface mb-xs">{event.title}</h2>
+                  <div className="flex flex-wrap items-center gap-md text-secondary font-body-md">
+                    <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[18px]">calendar_today</span> {event.date || 'Date TBD'}</span>
+                    <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[18px]">schedule</span> {event.time || 'Time TBD'}</span>
+                    <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[18px]">location_on</span> {event.location || 'Location TBD'}</span>
+                  </div>
+                </div>
+                <div className="flex gap-sm">
+                  <span className={`px-md py-xs rounded-full font-label-sm text-label-sm border flex items-center gap-1 ${
+                    event.status === 'published' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+                    event.status === 'pending' ? 'bg-amber-100 text-amber-600 border-amber-200' :
+                    event.status === 'rejected' ? 'bg-red-100 text-red-600 border-red-200' :
+                    'bg-surface-container-high text-secondary border-outline-variant'
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${
+                      event.status === 'published' ? 'bg-emerald-500' :
+                      event.status === 'pending' ? 'bg-amber-500 animate-pulse' :
+                      event.status === 'rejected' ? 'bg-red-500' :
+                      'bg-outline'
+                    }`}></span>
+                    {event.status?.charAt(0).toUpperCase() + event.status?.slice(1)}
+                  </span>
+                  {event.votingEnabled && (
+                    <span className="px-md py-xs rounded-full bg-tertiary/10 text-tertiary font-label-sm text-label-sm border border-tertiary/20 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">how_to_vote</span> Voting Enabled
+                    </span>
+                  )}
+                  {event.rsvpEnabled && (
+                    <span className="px-md py-xs rounded-full bg-primary/10 text-primary font-label-sm text-label-sm border border-primary/20 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">event_available</span> RSVP Enabled
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="mb-xl">
+                <h3 className="font-headline-sm text-on-surface mb-sm">Description</h3>
+                <p className="text-secondary font-body-md whitespace-pre-line">{event.description || 'No description provided.'}</p>
+              </div>
+
+              {/* Key Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                  <p className="text-secondary font-label-sm uppercase tracking-wider mb-sm">Category</p>
+                  <p className="font-bold text-on-surface">{event.category || '—'}</p>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                  <p className="text-secondary font-label-sm uppercase tracking-wider mb-sm">Location Type</p>
+                  <p className="font-bold text-on-surface capitalize">{event.locationType || '—'}</p>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                  <p className="text-secondary font-label-sm uppercase tracking-wider mb-sm">Organizer</p>
+                  <p className="font-bold text-on-surface">{event.organizerName || event.organizerEmail}</p>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                  <p className="text-secondary font-label-sm uppercase tracking-wider mb-sm">Event Slug</p>
+                  <p className="font-bold text-on-surface font-mono text-sm">{event.slug}</p>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                  <p className="text-secondary font-label-sm uppercase tracking-wider mb-sm">Vote Price</p>
+                  <p className="font-bold text-on-surface">{event.votingEnabled ? money(event.votePrice || 0) : 'N/A'}</p>
+                </div>
+                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                  <p className="text-secondary font-label-sm uppercase tracking-wider mb-sm">Voting End Date</p>
+                  <p className="font-bold text-on-surface">{event.votingEndDate || 'Not set'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Ticket Tiers */}
+          <div className="bg-surface border border-outline-variant rounded-2xl p-xl shadow-sm">
+            <h3 className="font-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+              <span className="material-symbols-outlined text-primary">confirmation_number</span> Ticket Tiers
+            </h3>
+            {event.ticketTiers.length === 0 ? (
+              <p className="text-secondary font-body-md">No ticket tiers configured. This is a free / RSVP event.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+                {event.ticketTiers.map(t => (
+                  <div key={t.id} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                    <h4 className="font-bold text-on-surface mb-sm">{t.name}</h4>
+                    <div className="flex justify-between text-body-sm text-secondary mb-xs">
+                      <span>Price</span>
+                      <span className="font-bold text-on-surface">{money(t.price)}</span>
+                    </div>
+                    <div className="flex justify-between text-body-sm text-secondary mb-xs">
+                      <span>Sold</span>
+                      <span className="font-bold text-on-surface">{t.sold} / {t.quantity}</span>
+                    </div>
+                    <div className="w-full bg-surface-container-high h-2 rounded-full mt-sm overflow-hidden">
+                      <div className={`h-2 rounded-full ${t.sold >= t.quantity ? 'bg-outline' : 'bg-primary'}`} style={{ width: `${t.quantity > 0 ? Math.round((t.sold / t.quantity) * 100) : 0}%` }}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Speakers */}
+          {event.speakers && event.speakers.length > 0 && (
+            <div className="bg-surface border border-outline-variant rounded-2xl p-xl shadow-sm">
+              <h3 className="font-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+                <span className="material-symbols-outlined text-tertiary">mic</span> Speakers
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+                {event.speakers.map(s => (
+                  <div key={s.id} className="flex items-center gap-md bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center shrink-0">
+                      {s.imageUrl ? <img className="w-full h-full object-cover" src={s.imageUrl} alt={s.name} /> : <span className="material-symbols-outlined text-primary">person</span>}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-on-surface">{s.name}</h4>
+                      <p className="text-secondary font-body-sm">{s.title}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Agenda */}
+          {event.agenda && event.agenda.length > 0 && (
+            <div className="bg-surface border border-outline-variant rounded-2xl p-xl shadow-sm">
+              <h3 className="font-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+                <span className="material-symbols-outlined text-primary">event_note</span> Agenda / Schedule
+              </h3>
+              <div className="space-y-md">
+                {event.agenda.map(item => (
+                  <div key={item.id} className="flex gap-md bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+                    <div className="shrink-0 w-24 text-center">
+                      <p className="font-bold text-primary text-sm">{item.start}</p>
+                      <p className="text-secondary text-xs">to {item.end}</p>
+                    </div>
+                    <div className="border-l border-outline-variant pl-md">
+                      <h4 className="font-bold text-on-surface">{item.title}</h4>
+                      {item.description && <p className="text-secondary font-body-sm mt-xs">{item.description}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Voting Categories (read-only overview) */}
+          {event.votingEnabled && event.votingCategories.length > 0 && (
+            <div className="bg-surface border border-outline-variant rounded-2xl p-xl shadow-sm">
+              <h3 className="font-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+                <span className="material-symbols-outlined text-tertiary">how_to_vote</span> Voting Categories
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                {event.votingCategories.map(cat => (
+                  <div key={cat.id} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
+                    <h4 className="font-bold text-on-surface mb-sm">{cat.name}</h4>
+                    <p className="text-secondary font-body-sm">{cat.nominees.length} nominee{cat.nominees.length !== 1 ? 's' : ''}</p>
+                    <div className="mt-sm flex flex-wrap gap-xs">
+                      {cat.nominees.map(n => (
+                        <span key={n.id} className="bg-surface-container px-sm py-xs rounded-full text-xs text-secondary border border-outline-variant">
+                          {n.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Public Links */}
+          <div className="bg-surface border border-outline-variant rounded-2xl p-xl shadow-sm">
+            <h3 className="font-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+              <span className="material-symbols-outlined text-primary">link</span> Public Links
+            </h3>
+            <div className="space-y-md">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+                <div>
+                  <p className="font-label-md text-on-surface">Event Page</p>
+                  <p className="text-secondary font-body-sm font-mono">{window.location.origin}/event/{event.slug}</p>
+                </div>
+                <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/event/${event.slug}`); alert('Link copied!'); }} className="text-primary font-label-md font-bold hover:underline flex items-center gap-xs shrink-0">
+                  <span className="material-symbols-outlined text-[18px]">content_copy</span> Copy
+                </button>
+              </div>
+              {event.votingEnabled && (
+                <>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+                    <div>
+                      <p className="font-label-md text-on-surface">Nomination Page</p>
+                      <p className="text-secondary font-body-sm font-mono">{window.location.origin}/event/{event.slug}/nominate</p>
+                    </div>
+                    <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/event/${event.slug}/nominate`); alert('Link copied!'); }} className="text-primary font-label-md font-bold hover:underline flex items-center gap-xs shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">content_copy</span> Copy
+                    </button>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-sm bg-surface-container-lowest border border-outline-variant rounded-xl p-md">
+                    <div>
+                      <p className="font-label-md text-on-surface">Voting Page</p>
+                      <p className="text-secondary font-body-sm font-mono">{window.location.origin}/event/{event.slug}/vote</p>
+                    </div>
+                    <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/event/${event.slug}/vote`); alert('Link copied!'); }} className="text-primary font-label-md font-bold hover:underline flex items-center gap-xs shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">content_copy</span> Copy
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </main>

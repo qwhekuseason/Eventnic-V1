@@ -82,15 +82,54 @@ export default function PublicNomineeVotingPage() {
       alert('Please select a payment method.');
       return;
     }
+
+    const paystack = (window as any).PaystackPop;
+    if (!paystack) {
+      alert('Paystack is not available. Please try again later.');
+      return;
+    }
+
     setProcessing(true);
-    // TODO: Replace this timeout with real Paystack API integration
-    // Use: window.PaystackPop.setup({ key, email, amount, ... })
-    setTimeout(async () => {
-      await castVote(event.id, category.id, nominee.id, qty);
-      setProcessing(false);
-      setShowCheckoutModal(false);
-      setPaymentSuccess(true);
-    }, 2500);
+    const reference = `vote-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const handler = paystack.setup({
+      key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxx',
+      email: buyerEmail,
+      amount: Math.round(total * 100),
+      currency: 'GHS',
+      channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
+      ref: reference,
+      metadata: {
+        event_id: event.id,
+        event_title: event.title,
+        category_id: category.id,
+        category_name: category.name,
+        nominee_id: nominee.id,
+        nominee_name: nominee.name,
+        selected_method: selectedMethod,
+      },
+      callback() {
+        (async () => {
+          try {
+            const success = await castVote(event.id, category.id, nominee.id, qty);
+            if (!success) throw new Error('Unable to record vote after payment.');
+            setProcessing(false);
+            setShowCheckoutModal(false);
+            setPaymentSuccess(true);
+          } catch (err) {
+            console.error('Vote recording failed:', err);
+            alert('Payment was successful, but recording your vote failed. Please contact support.');
+            setProcessing(false);
+            setShowCheckoutModal(false);
+          }
+        })();
+      },
+      onClose() {
+        setProcessing(false);
+        setShowCheckoutModal(false);
+      },
+    });
+
+    handler.openIframe();
   };
 
   return (

@@ -45,9 +45,17 @@ service cloud.firestore {
 
     // Tickets collection
     match /tickets/{ticketId} {
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid
+        || isAdmin()
+        || (isOrganizer() && get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerEmail == request.auth.token.email)
+      );
       allow create: if false; // Must use Backend API
-      allow update: if isAuthenticated(); // Organizers need to check them in, users might transfer
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid
+        || isAdmin()
+        || (isOrganizer() && get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerEmail == request.auth.token.email)
+      );
       allow delete: if isAdmin();
     }
 

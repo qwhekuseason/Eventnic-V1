@@ -94,15 +94,38 @@ export default function CheckoutEventnic() {
     if (isVote) {
       if (event && categoryId && nomineeId) {
         await castVote(event.id, categoryId, nomineeId, qty);
-        alert('Success! Your vote has been recorded.');
+        navigate('/payment-success', {
+          state: {
+            type: 'vote',
+            eventTitle: event.title,
+            categoryName: category?.name,
+            nomineeName: nominee?.name,
+            quantity: qty,
+            total,
+            reference: `FREE-${Date.now()}`,
+            eventDate: event.date,
+            eventLocation: event.location,
+          },
+        });
       }
     } else {
       if (event && tier) {
         await recordPurchase(event.id, tier.id, qty, attendeeNames);
-        alert('Success! Confirmation email sent with your ticket numbers.');
+        navigate('/payment-success', {
+          state: {
+            type: 'ticket',
+            orderNumber: `TCK-${Date.now().toString().slice(-6)}`,
+            eventTitle: event.title,
+            tierName: tier.name,
+            quantity: qty,
+            total,
+            reference: `FREE-${Date.now()}`,
+            eventDate: event.date,
+            eventLocation: event.location,
+          },
+        });
       }
     }
-    navigate('/payment-success');
   };
 
   const payWithPaystack = async () => {
@@ -114,36 +137,74 @@ export default function CheckoutEventnic() {
     }
 
     const email = buyerEmail || 'guest@eventnic.com';
+    const reference = `eventnic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const handler = window.PaystackPop.setup({
       key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxx',
       email,
       amount: Math.round(total * 100),
       currency: 'GHS',
       channels: ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
-      ref: `eventnic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      ref: reference,
       metadata: {
-        custom_fields: isVote ? [
-          { display_name: 'Event title', variable_name: 'event_title', value: event?.title },
-          { display_name: 'Vote Category', variable_name: 'category_name', value: category?.name },
-          { display_name: 'Nominee', variable_name: 'nominee_name', value: nominee?.name },
-        ] : [
-          { display_name: 'Event title', variable_name: 'event_title', value: event?.title },
-          { display_name: 'Ticket tier', variable_name: 'tier_name', value: tier?.name },
-        ],
+        event_id: event?.id,
+        event_title: event?.title,
+        type: isVote ? 'vote' : 'ticket',
+        ...(isVote
+          ? {
+              category_id: categoryId,
+              category_name: category?.name,
+              nominee_id: nomineeId,
+              nominee_name: nominee?.name,
+            }
+          : {
+              tier_id: tier?.id,
+              tier_name: tier?.name,
+            }),
       },
-      callback: function(response) {
-        if (isVote) {
-          castVote(event!.id, categoryId!, nomineeId!, qty).then(() => {
-            navigate('/payment-success');
-          });
-        } else {
-          recordPurchase(event!.id, tier!.id, qty, attendeeNames).then(() => {
-            navigate('/payment-success');
-          });
-        }
+      callback(response: any) {
+        (async () => {
+          try {
+            if (isVote) {
+              const success = await castVote(event!.id, categoryId!, nomineeId!, qty);
+              if (!success) throw new Error('Unable to record vote after payment.');
+              navigate('/payment-success', {
+                state: {
+                  type: 'vote',
+                  eventTitle: event!.title,
+                  categoryName: category?.name,
+                  nomineeName: nominee?.name,
+                  quantity: qty,
+                  total,
+                  reference: response.reference,
+                  eventDate: event!.date,
+                  eventLocation: event!.location,
+                },
+              });
+            } else {
+              await recordPurchase(event!.id, tier!.id, qty, attendeeNames);
+              navigate('/payment-success', {
+                state: {
+                  type: 'ticket',
+                  orderNumber: `TCK-${reference.slice(-6)}`,
+                  eventTitle: event!.title,
+                  tierName: tier!.name,
+                  quantity: qty,
+                  total,
+                  reference: response.reference,
+                  eventDate: event!.date,
+                  eventLocation: event!.location,
+                },
+              });
+            }
+          } catch (err) {
+            console.error('Post-payment action failed:', err);
+            setPaystackError('Payment succeeded but finalizing the order failed. Please contact support.');
+            navigate('/payment-failed');
+          }
+        })();
       },
-      onClose: function() {
-        alert('Payment cancelled.');
+      onClose() {
+        setPaystackError('Payment cancelled.');
       },
     });
 

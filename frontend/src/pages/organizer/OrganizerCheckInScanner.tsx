@@ -12,37 +12,49 @@ export default function OrganizerCheckInScanner() {
   const [lookupId, setLookupId] = useState('');
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [recentCheckIns, setRecentCheckIns] = useState<any[]>([]);
+  const [cameraPermission, setCameraPermission] = useState<'pending' | 'granted' | 'denied'>('pending');
 
   useEffect(() => {
-    // Initialize QR Code Scanner
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true },
-      false
-    );
-
-    let isScanning = false;
-
-    scanner.render(
-      async (decodedText) => {
-        // Prevent rapid duplicate scans
-        if (isScanning) return;
-        isScanning = true;
-        
-        await handleScan(decodedText);
-        
-        setTimeout(() => {
-          isScanning = false;
-        }, 3000);
-      },
-      () => {
-        // ignore continuous scan errors
+    const initScanner = async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        setCameraPermission('granted');
+      } catch (error) {
+        console.error('Camera permission denied or unavailable:', error);
+        setCameraPermission('denied');
+        return;
       }
-    );
 
-    return () => {
-      scanner.clear().catch(console.error);
+      const scanner = new Html5QrcodeScanner(
+        'reader',
+        { fps: 10, qrbox: { width: 250, height: 250 }, rememberLastUsedCamera: true },
+        false
+      );
+
+      let isScanning = false;
+
+      scanner.render(
+        async (decodedText) => {
+          if (isScanning) return;
+          isScanning = true;
+
+          await handleScan(decodedText);
+
+          setTimeout(() => {
+            isScanning = false;
+          }, 3000);
+        },
+        () => {
+          // ignore continuous scan errors
+        }
+      );
+
+      return () => {
+        scanner.clear().catch(console.error);
+      };
     };
+
+    initScanner();
   }, []);
 
   const handleScan = async (ticketId: string) => {
@@ -89,7 +101,8 @@ export default function OrganizerCheckInScanner() {
   };
 
   const handleManualLookup = () => {
-    if (lookupId) handleScan(lookupId);
+    const trimmedId = lookupId.trim();
+    if (trimmedId) handleScan(trimmedId);
   };
 
   return (
@@ -114,28 +127,41 @@ export default function OrganizerCheckInScanner() {
             <div className="w-full relative z-10" id="reader"></div>
 
             <div className="relative z-10 w-full mt-4 min-h-[120px]">
-              {scanStatus === 'idle' && (
-                <div className="text-center text-secondary bg-surface-container p-md rounded-xl mx-auto max-w-[320px]">
-                  <p className="font-bold">Waiting for scan...</p>
-                </div>
-              )}
+              {cameraPermission === 'pending' && (
+              <div className="text-center text-secondary bg-surface-container p-md rounded-xl mx-auto max-w-[320px]">
+                <p className="font-bold">Requesting camera permission...</p>
+              </div>
+            )}
 
-              {scanStatus === 'success' && (
-                <div className="text-center bg-emerald-500/10 text-green-800 p-md rounded-2xl border border-emerald-500/30 shadow-lg animate-in zoom-in">
-                  <span className="material-symbols-outlined text-[48px] text-emerald-600 dark:text-emerald-400 block mb-xs">check_circle</span>
-                  <h3 className="font-display text-xl font-bold mb-xs">Valid Ticket!</h3>
-                  <p className="font-bold">{lastScanned?.name}</p>
-                  <p className="text-sm opacity-80">{lastScanned?.ticketType}</p>
-                </div>
-              )}
+            {cameraPermission === 'denied' && (
+              <div className="text-center text-secondary bg-error-container p-md rounded-xl mx-auto max-w-[320px] border border-error/30">
+                <p className="font-bold">Camera permission is required.</p>
+                <p className="text-sm mt-2">Please allow camera access in your browser and refresh this page.</p>
+              </div>
+            )}
 
-              {scanStatus === 'error' && (
-                <div className="text-center bg-error-container text-red-800 p-md rounded-2xl border border-error/30 shadow-lg animate-in zoom-in">
-                  <span className="material-symbols-outlined text-[48px] text-error block mb-xs">cancel</span>
-                  <h3 className="font-display text-xl font-bold mb-xs">Invalid Ticket</h3>
-                  <p className="font-bold text-sm">This QR code is not recognized or has already been used.</p>
-                </div>
-              )}
+            {cameraPermission === 'granted' && scanStatus === 'idle' && (
+              <div className="text-center text-secondary bg-surface-container p-md rounded-xl mx-auto max-w-[320px]">
+                <p className="font-bold">Waiting for scan...</p>
+              </div>
+            )}
+
+            {cameraPermission === 'granted' && scanStatus === 'success' && (
+              <div className="text-center bg-emerald-500/10 text-green-800 p-md rounded-2xl border border-emerald-500/30 shadow-lg animate-in zoom-in">
+                <span className="material-symbols-outlined text-[48px] text-emerald-600 dark:text-emerald-400 block mb-xs">check_circle</span>
+                <h3 className="font-display text-xl font-bold mb-xs">Valid Ticket!</h3>
+                <p className="font-bold">{lastScanned?.name}</p>
+                <p className="text-sm opacity-80">{lastScanned?.ticketType}</p>
+              </div>
+            )}
+
+            {cameraPermission === 'granted' && scanStatus === 'error' && (
+              <div className="text-center bg-error-container text-red-800 p-md rounded-2xl border border-error/30 shadow-lg animate-in zoom-in">
+                <span className="material-symbols-outlined text-[48px] text-error block mb-xs">cancel</span>
+                <h3 className="font-display text-xl font-bold mb-xs">Invalid Ticket</h3>
+                <p className="font-bold text-sm">This QR code is not recognized or has already been used.</p>
+              </div>
+            )}
             </div>
           </div>
 

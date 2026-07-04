@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEvents, eventSold, eventCapacity, eventSoldPct } from '../contexts/EventsContext';
+import { useNominations } from '../contexts/NominationsContext';
 import { motion } from 'framer-motion';
 
 const money = (n: number) => 'GH₵ ' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -20,11 +21,13 @@ export default function OrganizerDashboardEventnic() {
   const { user } = useAuth();
   const { getEventsByOrganizer, organizerTotals } = useEvents();
 
+  const { nominations } = useNominations();
   const email = user?.email || '';
   const events = getEventsByOrganizer(email);
   const totals = organizerTotals(email);
   const isPending = user?.verificationStatus === 'PENDING';
   const isSuspended = user?.status === 'suspended';
+  const totalPendingNominations = events.reduce((acc, e) => acc + nominations.filter(n => n.eventId === e.id && n.status === 'pending').length, 0);
 
   return (
     <main className="min-h-screen bg-background pt-[100px] pb-xxl">
@@ -56,6 +59,10 @@ export default function OrganizerDashboardEventnic() {
               <p className="font-body-lg text-white/80 max-w-2xl">Manage your events, track real-time sales, and connect with your attendees all in one place.</p>
             </div>
             <div className="flex flex-wrap gap-sm">
+              <Link to="/organizer/nominations" className="flex items-center justify-center gap-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white px-md h-[48px] rounded-xl font-bold transition-colors backdrop-blur-md relative">
+                <span className="material-symbols-outlined text-[20px]">person_add</span> Nominations
+                {totalPendingNominations > 0 && <span className="absolute -top-1 -right-1 bg-error text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{totalPendingNominations}</span>}
+              </Link>
               <Link to="/organizer/scanner" className="flex items-center justify-center gap-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white px-md h-[48px] rounded-xl font-bold transition-colors backdrop-blur-md">
                 <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span> Scanner
               </Link>
@@ -148,6 +155,7 @@ export default function OrganizerDashboardEventnic() {
                     <th className="px-xl py-md font-label-md text-secondary uppercase tracking-wider text-xs">Event Details</th>
                     <th className="px-xl py-md font-label-md text-secondary uppercase tracking-wider text-xs">Date &amp; Time</th>
                     <th className="px-xl py-md font-label-md text-secondary uppercase tracking-wider text-xs">Sales Progress</th>
+                    <th className="px-xl py-md font-label-md text-secondary uppercase tracking-wider text-xs">Nominations</th>
                     <th className="px-xl py-md font-label-md text-secondary uppercase tracking-wider text-xs">Status</th>
                     <th className="px-xl py-md"></th>
                   </tr>
@@ -185,10 +193,20 @@ export default function OrganizerDashboardEventnic() {
                             </div>
                           </div>
                         </td>
+                        <td className="px-xl py-lg">
+                          {(() => {
+                            const nomCount = nominations.filter(n => n.eventId === e.id && n.status === 'pending').length;
+                            return nomCount > 0 ? (
+                              <span className="bg-error text-white text-xs font-bold px-2.5 py-1 rounded-full">{nomCount} pending</span>
+                            ) : (
+                              <span className="text-secondary text-xs">—</span>
+                            );
+                          })()}
+                        </td>
                         <td className="px-xl py-lg"><StatusBadge event={e} /></td>
                         <td className="px-xl py-lg text-right">
-                          <button onClick={(ev) => { ev.stopPropagation(); navigate(`/event-analytics?event=${e.id}`); }} className="w-10 h-10 flex items-center justify-center hover:bg-surface-container-high rounded-full text-secondary hover:text-on-surface transition-colors">
-                            <span className="material-symbols-outlined">chevron_right</span>
+                          <button onClick={(ev) => { ev.stopPropagation(); navigate(`/event-analytics?event=${e.id}`); }} className="bg-primary/10 text-primary hover:bg-primary hover:text-white px-md py-xs rounded-full font-label-sm font-bold transition-all flex items-center gap-xs">
+                            <span className="material-symbols-outlined text-[16px]">settings</span> Manage
                           </button>
                         </td>
                       </tr>
