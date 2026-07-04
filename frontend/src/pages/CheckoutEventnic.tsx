@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEvents } from '../contexts/EventsContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '../config/firebase';
+import { generateReference } from '../config/api';
 
 const money = (n) => 'GH₵ ' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
