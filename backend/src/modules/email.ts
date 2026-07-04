@@ -87,6 +87,16 @@ export const sendBroadcast = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+    const escapeHtml = (text: string) =>
+      text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    const sanitizedMessage = escapeHtml(message).replace(/\n/g, '<br/>');
+
     if (process.env.SMTP_USER) {
       // Send the emails using BCC
       await transporter.sendMail({
@@ -94,7 +104,7 @@ export const sendBroadcast = async (req: Request, res: Response): Promise<void> 
         bcc: emailList,
         subject: subject,
         text: message,
-        html: `<p>${message.replace(/\n/g, '<br/>')}</p>`,
+        html: `<p>${sanitizedMessage}</p>`,
       });
     } else {
       console.log('SMTP not configured, simulating broadcast to:', emailList.length, 'recipients');

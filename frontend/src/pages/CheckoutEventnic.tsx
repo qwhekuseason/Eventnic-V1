@@ -137,7 +137,7 @@ export default function CheckoutEventnic() {
     }
 
     const email = buyerEmail || 'guest@eventnic.com';
-    const reference = `eventnic-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const reference = generateReference('eventnic');
     const handler = window.PaystackPop.setup({
       key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxx',
       email,

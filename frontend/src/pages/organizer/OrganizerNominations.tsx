@@ -6,6 +6,7 @@ import type { NominationSubmission } from '../../contexts/NominationsContext';
 import { app } from '../../config/firebase';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { apiBaseUrl, securePassword } from '../../config/api';
 
 type TabFilter = 'pending' | 'approved' | 'rejected' | 'all';
 
@@ -95,14 +96,14 @@ export default function OrganizerNominations() {
       const firstName = nomination.nomineeName.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
       const eventAbbr = selectedEvent.slug.split('-')[0].toLowerCase();
       const email = nomination.email || `${firstName}+${eventAbbr}@eventnic.com`;
-      const password = Math.random().toString(36).slice(-8);
+      const password = securePassword();
 
       let accountCreated = false;
       try {
         const auth = getAuth(app);
         const token = await auth.currentUser?.getIdToken();
         if (token) {
-          const response = await fetch('http://localhost:5000/api/nominees/create-account', {
+          const response = await fetch(`${apiBaseUrl}/api/nominees/create-account`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -157,11 +158,11 @@ export default function OrganizerNominations() {
     if (!confirm(`Are you sure you want to reset the password for ${nominee.name}?`)) return;
     
     try {
-      const newPassword = Math.random().toString(36).slice(-8);
+      const newPassword = securePassword();
       const auth = getAuth(app);
       const token = await auth.currentUser?.getIdToken();
 
-      const response = await fetch('http://localhost:5000/api/nominees/reset-password', {
+      const response = await fetch(`${apiBaseUrl}/api/nominees/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

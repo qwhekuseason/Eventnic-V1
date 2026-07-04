@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useEvents } from '../contexts/EventsContext';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '../config/firebase';
+import { generateReference } from '../config/api';
 
 export default function PublicNomineeVotingPage() {
   const { slug, categoryId, nomineeId } = useParams();
@@ -90,7 +91,7 @@ export default function PublicNomineeVotingPage() {
     }
 
     setProcessing(true);
-    const reference = `vote-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const reference = generateReference('vote');
     const handler = paystack.setup({
       key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxx',
       email: buyerEmail,

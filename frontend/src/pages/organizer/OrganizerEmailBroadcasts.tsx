@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { useEvents } from '../../contexts/EventsContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiBaseUrl } from '../../config/api';
 
 export default function OrganizerEmailBroadcasts() {
   const [subject, setSubject] = useState('');
@@ -36,7 +37,7 @@ export default function OrganizerEmailBroadcasts() {
       const user = auth.currentUser;
       const token = user ? await user.getIdToken() : '';
       
-      const res = await fetch('http://localhost:5000/api/broadcasts/send', {
+      const res = await fetch(`${apiBaseUrl}/api/broadcasts/send`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

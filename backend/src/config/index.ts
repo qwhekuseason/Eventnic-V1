@@ -8,8 +8,13 @@ const toNumber = (value: string | undefined, fallback: number) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+const parseCorsOrigin = (value: string | undefined) => {
+  if (!value) return ['http://localhost:5173'];
+  return value.split(',').map((item) => item.trim()).filter(Boolean);
+};
+
 export const config = {
   port: toNumber(process.env.PORT, 5000),
-  corsOrigin: process.env.CORS_ORIGIN ?? '*'
+  corsOrigin: parseCorsOrigin(process.env.CORS_ORIGIN),
 };
 

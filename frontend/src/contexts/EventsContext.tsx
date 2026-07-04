@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { getFirestore, collection, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { app } from '../config/firebase';
+import { apiBaseUrl, secureId } from '../config/api';
 
 export type EventStatus = 'draft' | 'pending' | 'published' | 'rejected';
 
@@ -91,7 +92,7 @@ export interface DraftEvent {
 const DRAFT_KEY = 'eventnic_draft_v2';
 const VOTES_KEY = 'eventnic_votes_v2';
 
-export const uid = () => Math.random().toString(36).slice(2, 10);
+export const uid = () => secureId().slice(0, 8);
 
 export const slugify = (s: string) =>
   s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || `event-${uid()}`;
@@ -320,7 +321,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
     async (data: DraftEvent, status: EventStatus, organizerEmail: string, organizerName: string, votePrice: number): Promise<EventRecord> => {
       const token = await auth.currentUser?.getIdToken();
       
-      const response = await fetch('http://localhost:5000/api/events/create', {
+      const response = await fetch(`${apiBaseUrl}/api/events/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -365,7 +366,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/events/vote', {
+        const response = await fetch(`${apiBaseUrl}/api/events/vote`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ eventId, categoryId, nomineeId, qty, voterId })
@@ -392,7 +393,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       const auth = getAuth(app);
       const user = auth.currentUser;
       const token = user ? await user.getIdToken() : null;
-      const res = await fetch(`http://localhost:5000/api/events/purchase`, {
+      const res = await fetch(`${apiBaseUrl}/api/events/purchase`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
