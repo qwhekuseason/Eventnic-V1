@@ -12,6 +12,7 @@ import { sendBroadcast } from './modules/email';
 import { paystackWebhook } from './modules/webhooks';
 import { validate } from './middleware/validate';
 import { createEventSchema, purchaseTicketSchema, castVoteSchema, broadcastSchema } from './validators/events';
+import { config } from './config/index';
 
 dotenv.config();
 
@@ -19,7 +20,13 @@ const app = express();
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: false,
+    optionsSuccessStatus: 200,
+  }),
+);
 app.use(express.json());
 
 // Rate limiting

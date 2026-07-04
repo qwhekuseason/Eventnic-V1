@@ -13,7 +13,36 @@ let app;
 try {
   // Option 1: Use GOOGLE_APPLICATION_CREDENTIALS environment variable
   // Option 2: Provide the service account key explicitly (e.g. loading from a JSON file)
-  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH) {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY_JSON) {
+    try {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_JSON);
+      app = initializeApp({
+        credential: cert(serviceAccount)
+      });
+      console.log('Firebase Admin initialized with service account JSON from environment.');
+    } catch (e) {
+      console.warn('Could not parse FIREBASE_SERVICE_ACCOUNT_KEY_JSON, falling back to other credentials.');
+      if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH) {
+        try {
+          const serviceAccount = require(path.resolve(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH));
+          app = initializeApp({
+            credential: cert(serviceAccount)
+          });
+          console.log('Firebase Admin initialized with service account key from path.');
+        } catch (pathError) {
+          console.warn('Could not load service account key from path, falling back to application default credentials.');
+          app = initializeApp({
+            credential: applicationDefault()
+          });
+        }
+      } else {
+        app = initializeApp({
+          credential: applicationDefault()
+        });
+        console.warn('Firebase Admin initialized with application default credentials.');
+      }
+    }
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH) {
     try {
       const serviceAccount = require(path.resolve(process.env.FIREBASE_SERVICE_ACCOUNT_KEY_PATH));
       app = initializeApp({
@@ -21,7 +50,7 @@ try {
       });
       console.log('Firebase Admin initialized with service account key.');
     } catch (e) {
-      console.warn('Could not load service account key, falling back to application default credentials.');
+      console.warn('Could not load service account key from path, falling back to application default credentials.');
       app = initializeApp({
         credential: applicationDefault()
       });

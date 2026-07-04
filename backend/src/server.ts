@@ -28,6 +28,6 @@ app.use(notFound);
 app.use(errorHandler);
 
 app.listen(config.port, () => {
-  console.log(`[backend] Listening on http://localhost:${config.port}`);
+  console.log(`[backend] Listening on port ${config.port}`);
 });
 
