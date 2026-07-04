@@ -71,3 +71,22 @@ export default defineConfig([
   },
 ])
 ```
+
+## Vercel / Deployment Environment Variables
+
+This project uses Vite environment variables at build time. In production, Vercel will not automatically use `.env.example`; you must define the values in your Vercel dashboard.
+
+Required frontend environment variables:
+
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_PAYSTACK_PUBLIC_KEY`
+- `VITE_API_URL` (your backend URL)
+
+If these are missing or invalid, Firebase will fail during app initialization with `auth/invalid-api-key`.
+
+For local development, copy `.env.example` to `.env` and fill in your values.
