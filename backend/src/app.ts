@@ -8,6 +8,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { handleUSSD } from './modules/ussd';
 import { createEvent, purchaseTicket, castVote } from './modules/events';
+import { getStats } from './modules/stats';
 import { sendBroadcast } from './modules/email';
 import { paystackWebhook } from './modules/webhooks';
 import { validate } from './middleware/validate';
@@ -40,6 +41,9 @@ app.use('/api/', apiLimiter);
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', message: 'Eventnic API is running' });
 });
+
+// Live stats
+app.get('/api/stats', getStats);
 
 // USSD Gateway Route
 app.post('/api/ussd', handleUSSD);

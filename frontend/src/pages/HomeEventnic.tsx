@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useEvents, eventSold, eventCapacity } from '../contexts/EventsContext';
 import { useEffect, useState } from 'react';
+import { apiBaseUrl } from '../config/api';
 
 const priceLabel = (e) => {
   if (!e.ticketTiers.length) return 'Free';
@@ -21,6 +22,8 @@ export default function HomeEventnic() {
   
   const taglines = ["online events.", "ticket sales.", "live voting.", "guest RSVPs."];
   const [taglineIndex, setTaglineIndex] = useState(0);
+  const [stats, setStats] = useState({ eventsHosted: null, votesCast: null, ticketsSold: null, globalReach: null });
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -28,6 +31,23 @@ export default function HomeEventnic() {
     }, 3000);
     return () => clearInterval(interval);
   }, [taglines.length]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`${apiBaseUrl}/api/stats`);
+        if (!res.ok) throw new Error('Failed to fetch stats');
+        const data = await res.json();
+        if (!cancelled) setStats(data);
+      } catch (err: any) {
+        console.error('Error fetching stats', err);
+        if (!cancelled) setStatsError(err.message || 'Error');
+      }
+    };
+    fetchStats();
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <main className="bg-background min-h-screen">
@@ -94,21 +114,21 @@ export default function HomeEventnic() {
       {/* Statistics Section */}
       <section className="py-[80px] bg-surface border-b border-outline-variant relative z-20">
         <div className="max-w-container-max mx-auto px-margin">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-lg text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-lg text-center">
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">2,500+</h3>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">{stats.eventsHosted !== null ? stats.eventsHosted.toLocaleString() : '2,500+'}</h3>
               <p className="text-on-surface font-body-md font-medium">Events Hosted</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">500K+</h3>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">{stats.votesCast !== null ? stats.votesCast.toLocaleString() : '500K+'}</h3>
               <p className="text-on-surface font-body-md font-medium">Votes Cast</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">100K+</h3>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">{stats.ticketsSold !== null ? stats.ticketsSold.toLocaleString() : '100K+'}</h3>
               <p className="text-on-surface font-body-md font-medium">Tickets Sold</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.4 }}>
-              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">1M+</h3>
+              <h3 className="text-[48px] md:text-[64px] font-display text-gradient-premium leading-none mb-sm">{stats.globalReach !== null ? (stats.globalReach > 0 ? `${stats.globalReach}+` : stats.globalReach) : '1M+'}</h3>
               <p className="text-on-surface font-body-md font-medium">Global Reach</p>
             </motion.div>
           </div>
