@@ -48,7 +48,8 @@ app.use(
     optionsSuccessStatus: 200,
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Rate limiting
 app.set('trust proxy', 1);
