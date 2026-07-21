@@ -143,6 +143,7 @@ export default function SignupVerificationEventnic() {
                 <div className="mt-1">
                   <input id="registrationNumber" name="registrationNumber" type="text" required value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} className="block w-full rounded-lg border border-outline-variant px-3 py-2 text-on-surface placeholder-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm transition-all" placeholder="RC-123456" />
                 </div>
+              </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-on-surface">Phone number</label>
                 <div className="mt-1">
