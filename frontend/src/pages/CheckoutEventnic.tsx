@@ -24,24 +24,27 @@ export default function CheckoutEventnic() {
   const [buyerPhone, setBuyerPhone] = useState('');
   const [attendeeNames, setAttendeeNames] = useState<string[]>(['']);
 
-  // Keep attendeeNames length in sync with qty
+  // Keep attendeeNames length in sync with totalSlots (qty × admitsCount)
   useEffect(() => {
+    const slots = qty * ((!isVote && tier) ? (tier.admitsCount || 1) : 1);
     setAttendeeNames((prev) => {
-      if (prev.length === qty) return prev;
+      if (prev.length === slots) return prev;
       const newNames = [...prev];
-      if (newNames.length < qty) {
-        while (newNames.length < qty) newNames.push('');
-      } else {
-        newNames.length = qty;
-      }
+      while (newNames.length < slots) newNames.push('');
+      newNames.length = slots;
       return newNames;
     });
-  }, [qty]);
+  }, [qty, tier]);
 
   const event = params.get('event') ? getEvent(params.get('event')) : null;
   const tier = !isVote && event ? event.ticketTiers.find((t) => t.id === params.get('tier')) : null;
   const category = isVote && event ? event.votingCategories?.find(c => c.id === categoryId) : null;
   const nominee = category ? category.nominees.find(n => n.id === nomineeId) : null;
+
+  // How many people each individual ticket admits (default 1)
+  const admitsCount = !isVote && tier ? (tier.admitsCount || 1) : 1;
+  // Total name slots = tickets bought × people per ticket
+  const totalSlots = qty * admitsCount;
 
   const [platformSettings, setPlatformSettings] = useState({ deductionFeePercent: 5, baseVotePrice: 0 });
   const [paystackLoaded, setPaystackLoaded] = useState(false);
@@ -267,24 +270,44 @@ export default function CheckoutEventnic() {
                 {isVote ? `Vote for ${nominee?.name}` : (tier ? `${tier.name} ${tier.admitsCount ? `(Admits ${tier.admitsCount} ${(tier.admitsCount === 1 ? 'person' : 'people')}/ticket)` : ''}` : 'Ticket')}
               </h3>
               {!isVote && (
-                <div className="space-y-md">
-                  {Array.from({ length: qty }).map((_, i) => (
-                    <div key={i} className="bg-surface p-md rounded-lg border border-outline-variant">
-                      <label className="block font-label-md text-label-md text-on-surface-variant mb-xs">
-                        Attendee {i + 1} Full Name
-                      </label>
-                      <input 
-                        value={attendeeNames[i] || ''}
-                        onChange={(e) => {
-                          const newNames = [...attendeeNames];
-                          newNames[i] = e.target.value;
-                          setAttendeeNames(newNames);
-                        }}
-                        className="w-full bg-surface px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all" 
-                        placeholder={`Name for Ticket ${i + 1}`} 
-                        type="text" 
-                        required
-                      />
+                <div className="space-y-lg">
+                  {Array.from({ length: qty }).map((_, ticketIdx) => (
+                    <div key={ticketIdx} className="border border-outline-variant rounded-xl overflow-hidden">
+                      {/* Ticket header */}
+                      <div className="bg-primary/8 px-md py-sm flex items-center gap-xs border-b border-outline-variant">
+                        <span className="material-symbols-outlined text-primary text-[18px]">confirmation_number</span>
+                        <span className="font-label-md font-bold text-primary text-sm">
+                          Ticket {ticketIdx + 1}
+                          {admitsCount > 1 && (
+                            <span className="ml-xs font-normal text-secondary text-xs">(admits {admitsCount} {admitsCount === 1 ? 'person' : 'people'})</span>
+                          )}
+                        </span>
+                      </div>
+                      {/* Name slots for each person this ticket admits */}
+                      <div className="p-md space-y-sm">
+                        {Array.from({ length: admitsCount }).map((_, personIdx) => {
+                          const slotIndex = ticketIdx * admitsCount + personIdx;
+                          return (
+                            <div key={personIdx} className="bg-surface p-md rounded-lg border border-outline-variant">
+                              <label className="block font-label-md text-label-md text-on-surface-variant mb-xs">
+                                {admitsCount > 1 ? `Attendee ${personIdx + 1} Full Name` : 'Attendee Full Name'}
+                              </label>
+                              <input
+                                value={attendeeNames[slotIndex] || ''}
+                                onChange={(e) => {
+                                  const newNames = [...attendeeNames];
+                                  newNames[slotIndex] = e.target.value;
+                                  setAttendeeNames(newNames);
+                                }}
+                                className="w-full bg-surface-container-lowest px-md py-base border border-outline-variant rounded-lg font-body-md text-body-md transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                placeholder={admitsCount > 1 ? `Person ${personIdx + 1}'s full name` : `Name for Ticket ${ticketIdx + 1}`}
+                                type="text"
+                                required
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   ))}
                 </div>
