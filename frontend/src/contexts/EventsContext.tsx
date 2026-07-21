@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { getFirestore, collection, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { app } from '../config/firebase';
-import { apiBaseUrl, secureId } from '../config/api';
+import { apiBaseUrl, secureId, securePassword } from '../config/api';
 
 export type EventStatus = 'draft' | 'pending' | 'published' | 'rejected';
 
@@ -353,7 +353,81 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const approveEvent = useCallback(async (id: string) => {
+    // 1. Mark the event as published
     await updateDoc(doc(db, 'events', id), { status: 'published' });
+
+    // 2. Auto-generate nominee accounts for all pre-set nominees in votingCategories
+    try {
+      const auth = getAuth(app);
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+
+      // Find the event from the live snapshot array (captured in this closure via `events` state)
+      // We read from Firestore directly so we always have the latest data
+      const { getDoc } = await import('firebase/firestore');
+      const eventSnap = await getDoc(doc(db, 'events', id));
+      if (!eventSnap.exists()) return;
+
+      const eventData = eventSnap.data() as EventRecord;
+      const slug = eventData.slug || id;
+      const categories = eventData.votingCategories || [];
+
+      const createdAccounts: { name: string; email: string; password: string }[] = [];
+
+      for (const category of categories) {
+        for (const nominee of (category.nominees || [])) {
+          if (!nominee.name) continue;
+
+          // Build auto email: firstname+eventslug@eventnic.com
+          const firstName = nominee.name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+          const eventAbbr = slug.split('-')[0].toLowerCase();
+          const email = `${firstName}+${eventAbbr}@eventnic.com`;
+          const password = securePassword();
+
+          try {
+            const response = await fetch(`${apiBaseUrl}/api/nominees/create-account`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                email,
+                password,
+                name: nominee.name,
+                phone: (nominee as any).phone || '',
+                imageUrl: nominee.imageUrl || '',
+                eventId: id,
+              }),
+            });
+
+            if (response.ok) {
+              createdAccounts.push({ name: nominee.name, email, password });
+            } else {
+              const errData = await response.json().catch(() => ({}));
+              console.warn(`Nominee account creation skipped for "${nominee.name}":`, errData?.error);
+            }
+          } catch (err) {
+            console.warn(`Could not create account for nominee "${nominee.name}":`, err);
+          }
+        }
+      }
+
+      if (createdAccounts.length > 0) {
+        const lines = createdAccounts
+          .map((a) => `• ${a.name}\n  Email: ${a.email}\n  Password: ${a.password}`)
+          .join('\n\n');
+        alert(
+          `✅ Event Approved!\n\n` +
+          `${createdAccounts.length} nominee account(s) were automatically created:\n\n` +
+          lines +
+          `\n\nPlease share these credentials with the respective nominees.`
+        );
+      }
+    } catch (err) {
+      // Non-fatal: event is already approved, account creation is best-effort
+      console.warn('Auto-generating nominee accounts after approval failed:', err);
+    }
   }, []);
 
   const rejectEvent = useCallback(async (id: string) => {
