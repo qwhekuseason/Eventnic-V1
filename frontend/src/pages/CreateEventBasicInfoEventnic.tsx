@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useEvents, uid } from '../contexts/EventsContext';
 import LocationInput from '../components/LocationInput';
 import { GoogleMap, Marker } from '@react-google-maps/api';
+import { compressImage } from '../utils/imageCompressor';
 
 function Stepper() {
   const steps = ['Basic Info', 'Tickets', 'Schedule', 'Review'];
@@ -62,20 +63,26 @@ export default function CreateEventBasicInfoEventnic() {
       ),
     });
 
-  const onCover = (e) => {
+  const onCover = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => set({ coverImage: reader.result });
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 1200, 800, 0.8);
+      set({ coverImage: compressed });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const onNomineeImageUpload = (e, catId, nomId) => {
+  const onNomineeImageUpload = async (e, catId, nomId) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => updateNominee(catId, nomId, 'imageUrl', reader.result);
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file, 600, 600, 0.8);
+      updateNominee(catId, nomId, 'imageUrl', compressed);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const saveDraft = () => {
