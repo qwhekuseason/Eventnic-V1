@@ -280,7 +280,12 @@ export default function EventDetailsModal({
             </button>
 
             <div className="flex items-center gap-sm">
-              {onReject && (
+              {event.status === 'published' && (
+                <span className="px-md py-sm rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs border border-emerald-500/30 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">check_circle</span> Approved &amp; Live
+                </span>
+              )}
+              {event.status === 'pending' && onReject && (
                 <button
                   onClick={() => {
                     onReject(event.id);
@@ -291,7 +296,7 @@ export default function EventDetailsModal({
                   Reject Event
                 </button>
               )}
-              {onApprove && (
+              {event.status === 'pending' && onApprove && (
                 <button
                   onClick={() => {
                     onApprove(event.id);
