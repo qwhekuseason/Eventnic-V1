@@ -154,6 +154,83 @@ export default function OrganizerNominations() {
     }
   };
 
+  const [syncingPreset, setSyncingPreset] = useState(false);
+
+  const handleSyncPresetNominees = async () => {
+    if (!selectedEvent || !selectedEvent.votingCategories) return;
+    setSyncingPreset(true);
+
+    try {
+      const auth = getAuth(app);
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) {
+        alert('Please log in again to perform this action.');
+        return;
+      }
+
+      const created: { name: string; email: string; password: string }[] = [];
+      const slug = selectedEvent.slug || selectedEvent.id;
+      const eventAbbr = slug.split('-')[0].toLowerCase();
+
+      for (const cat of selectedEvent.votingCategories) {
+        for (const nom of (cat.nominees || [])) {
+          if (!nom.name) continue;
+
+          // Check if account already exists in generatedNominees list
+          const exists = generatedNominees.some(
+            (g) => g.name?.toLowerCase().trim() === nom.name.toLowerCase().trim()
+          );
+
+          if (exists) continue;
+
+          const firstName = nom.name.split(' ')[0].toLowerCase().replace(/[^a-z]/g, '');
+          const email = nom.email || `${firstName}+${eventAbbr}@eventnic.com`;
+          const password = securePassword();
+
+          try {
+            const res = await fetch(`${apiBaseUrl}/api/nominees/create-account`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                email,
+                password,
+                name: nom.name,
+                phone: (nom as any).phone || '',
+                imageUrl: nom.imageUrl || '',
+                eventId: selectedEvent.id,
+              }),
+            });
+
+            if (res.ok) {
+              created.push({ name: nom.name, email, password });
+            }
+          } catch (err) {
+            console.warn(`Account creation failed for ${nom.name}:`, err);
+          }
+        }
+      }
+
+      await loadGeneratedNominees(selectedEvent.id);
+
+      if (created.length > 0) {
+        const text = created
+          .map((a) => `• ${a.name}\n  Email: ${a.email}\n  Password: ${a.password}`)
+          .join('\n\n');
+        alert(`✅ Auto-Generated ${created.length} Nominee Account(s)!\n\n${text}\n\nPlease copy and share these login credentials with your nominees.`);
+      } else {
+        alert('All pre-set nominees for this event already have accounts generated!');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to auto-generate nominee accounts.');
+    } finally {
+      setSyncingPreset(false);
+    }
+  };
+
   const handleResetPassword = async (nominee: any) => {
     if (!confirm(`Are you sure you want to reset the password for ${nominee.name}?`)) return;
     
@@ -366,9 +443,21 @@ export default function OrganizerNominations() {
 
                   {/* Generated Nominee Accounts */}
                   <div className="bg-surface border border-outline-variant rounded-3xl p-xl shadow-sm">
-                    <div className="flex items-center gap-sm mb-lg">
-                      <span className="material-symbols-outlined text-tertiary">group</span>
-                      <h2 className="font-display text-[24px] text-on-surface">Generated Nominee Accounts</h2>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-md mb-lg">
+                      <div className="flex items-center gap-sm">
+                        <span className="material-symbols-outlined text-tertiary">group</span>
+                        <h2 className="font-display text-[24px] text-on-surface">Generated Nominee Accounts</h2>
+                      </div>
+                      {selectedEvent.votingCategories && selectedEvent.votingCategories.some(c => c.nominees && c.nominees.length > 0) && (
+                        <button
+                          onClick={handleSyncPresetNominees}
+                          disabled={syncingPreset}
+                          className="bg-tertiary/10 text-tertiary hover:bg-tertiary/20 disabled:opacity-50 px-md py-sm rounded-xl font-bold font-label-md transition-colors flex items-center justify-center gap-xs"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">person_add</span>
+                          {syncingPreset ? 'Generating Accounts...' : 'Auto-Generate Accounts for Pre-set Nominees'}
+                        </button>
+                      )}
                     </div>
 
                     {loadingNominees ? (
