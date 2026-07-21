@@ -18,8 +18,15 @@ export default function AdminUserManagement() {
       });
       // Sort by creation date
       setUsers(liveUsers.sort((a, b) => {
-        if (!a.createdAt || !b.createdAt) return 0;
-        return b.createdAt.localeCompare(a.createdAt);
+        const parseDate = (val: any) => {
+          if (!val) return 0;
+          if (typeof val === 'string') return new Date(val).getTime() || 0;
+          if (typeof val === 'number') return val;
+          if (val?.toDate && typeof val.toDate === 'function') return val.toDate().getTime();
+          if (val?.seconds) return val.seconds * 1000;
+          return 0;
+        };
+        return parseDate(b.createdAt) - parseDate(a.createdAt);
       }));
     }, (err) => console.error(err));
     
@@ -51,7 +58,8 @@ export default function AdminUserManagement() {
 
   const filtered = users.filter(u => {
     const status = u.status || 'active';
-    if (filter !== 'all' && u.role !== filter && status !== filter) return false;
+    const verStatus = u.verificationStatus || 'PENDING';
+    if (filter !== 'all' && u.role !== filter && status !== filter && verStatus !== filter) return false;
     const searchLower = search.toLowerCase();
     if (search && !(u.name?.toLowerCase().includes(searchLower)) && !(u.email?.toLowerCase().includes(searchLower))) return false;
     return true;
@@ -86,6 +94,7 @@ export default function AdminUserManagement() {
           </div>
           <select value={filter} onChange={(e) => setFilter(e.target.value)} className="bg-surface border border-outline-variant rounded-full px-lg py-xs text-on-surface font-body-sm focus:outline-none focus:border-primary">
             <option value="all">All Roles &amp; Statuses</option>
+            <option value="PENDING">Pending Verification</option>
             <option value="ORGANIZER">Organizers</option>
             <option value="NOMINEE">Nominees</option>
             <option value="VOTER">Voters</option>
