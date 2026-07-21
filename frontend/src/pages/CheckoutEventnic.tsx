@@ -24,18 +24,6 @@ export default function CheckoutEventnic() {
   const [buyerPhone, setBuyerPhone] = useState('');
   const [attendeeNames, setAttendeeNames] = useState<string[]>(['']);
 
-  // Keep attendeeNames length in sync with totalSlots (qty × admitsCount)
-  useEffect(() => {
-    const slots = qty * ((!isVote && tier) ? (tier.admitsCount || 1) : 1);
-    setAttendeeNames((prev) => {
-      if (prev.length === slots) return prev;
-      const newNames = [...prev];
-      while (newNames.length < slots) newNames.push('');
-      newNames.length = slots;
-      return newNames;
-    });
-  }, [qty, tier]);
-
   const event = params.get('event') ? getEvent(params.get('event')) : null;
   const tier = !isVote && event ? event.ticketTiers.find((t) => t.id === params.get('tier')) : null;
   const category = isVote && event ? event.votingCategories?.find(c => c.id === categoryId) : null;
@@ -45,6 +33,17 @@ export default function CheckoutEventnic() {
   const admitsCount = !isVote && tier ? (tier.admitsCount || 1) : 1;
   // Total name slots = tickets bought × people per ticket
   const totalSlots = qty * admitsCount;
+
+  // Keep attendeeNames length in sync with totalSlots (qty × admitsCount)
+  useEffect(() => {
+    setAttendeeNames((prev) => {
+      if (prev.length === totalSlots) return prev;
+      const newNames = [...prev];
+      while (newNames.length < totalSlots) newNames.push('');
+      newNames.length = totalSlots;
+      return newNames;
+    });
+  }, [totalSlots]);
 
   const [platformSettings, setPlatformSettings] = useState({ deductionFeePercent: 5, baseVotePrice: 0 });
   const [paystackLoaded, setPaystackLoaded] = useState(false);
