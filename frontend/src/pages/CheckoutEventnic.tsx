@@ -263,7 +263,9 @@ export default function CheckoutEventnic() {
               <h2 className="font-headline-sm text-headline-sm">{isVote ? 'Voting Details' : 'Attendee Details'}</h2>
             </div>
             <div className="mb-md">
-              <h3 className="font-label-md text-label-md text-primary mb-md">{isVote ? `Vote for ${nominee?.name}` : (tier ? `${tier.name}` : 'Ticket')}</h3>
+              <h3 className="font-label-md text-label-md text-primary mb-md">
+                {isVote ? `Vote for ${nominee?.name}` : (tier ? `${tier.name} ${tier.admitsCount ? `(Admits ${tier.admitsCount} ${(tier.admitsCount === 1 ? 'person' : 'people')}/ticket)` : ''}` : 'Ticket')}
+              </h3>
               {!isVote && (
                 <div className="space-y-md">
                   {Array.from({ length: qty }).map((_, i) => (

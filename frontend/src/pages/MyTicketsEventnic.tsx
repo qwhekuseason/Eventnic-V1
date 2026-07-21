@@ -37,6 +37,7 @@ export default function MyTicketsEventnic() {
             eventLocation: evt?.location || '',
             eventImg: evt?.coverImage || '/images/default-event.png',
             tierName: tier?.name || 'General Admission',
+            admitsCount: tier?.admitsCount || 1,
           };
         });
         
@@ -121,7 +122,7 @@ export default function MyTicketsEventnic() {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-[18px]">confirmation_number</span>
-                            <span>{ticket.tierName}</span>
+                            <span>{ticket.tierName} {ticket.admitsCount ? `(Admits ${ticket.admitsCount})` : ''}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="material-symbols-outlined text-[18px]">person</span>

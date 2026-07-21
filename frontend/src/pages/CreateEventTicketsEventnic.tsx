@@ -27,9 +27,9 @@ export default function CreateEventTicketsEventnic() {
   const { draft, updateDraft } = useEvents();
 
   const tiers = draft.ticketTiers;
-  const addTier = () => updateDraft({ ticketTiers: [...tiers, { id: uid(), name: '', price: 0, quantity: 0, sold: 0 }] });
+  const addTier = () => updateDraft({ ticketTiers: [...tiers, { id: uid(), name: '', price: 0, quantity: 0, sold: 0, admitsCount: 1 }] });
   const updateTier = (id, field, value) =>
-    updateDraft({ ticketTiers: tiers.map((t) => (t.id === id ? { ...t, [field]: field === 'name' ? value : Number(value) } : t)) });
+    updateDraft({ ticketTiers: tiers.map((t) => (t.id === id ? { ...t, [field]: field === 'name' ? value : Math.max(0, Number(value)) } : t)) });
   const removeTier = (id) => updateDraft({ ticketTiers: tiers.filter((t) => t.id !== id) });
 
   const handleBack = () => navigate('/create-event/basic-info');
@@ -41,7 +41,7 @@ export default function CreateEventTicketsEventnic() {
 
       <div className="mb-xl text-center md:text-left">
         <h1 className="font-headline-lg text-headline-lg text-on-surface mb-xs">Ticket Types &amp; Pricing</h1>
-        <p className="font-body-md text-body-md text-secondary">Define how attendees can join your event. Add multiple tiers like Early Bird, VIP, or General Admission.</p>
+        <p className="font-body-md text-body-md text-secondary">Define how attendees can join your event. Add multiple tiers and specify how many people each ticket accommodates (e.g. Single, Double, VIP Group).</p>
       </div>
 
       <div className="space-y-md">
@@ -53,19 +53,23 @@ export default function CreateEventTicketsEventnic() {
           )}
           {tiers.map((t) => (
             <div key={t.id} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:border-primary transition-all group">
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-lg items-end">
-                <div className="md:col-span-5">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-md items-end">
+                <div className="md:col-span-4">
                   <label className="block font-label-md text-label-md text-on-surface-variant mb-base">Ticket Name</label>
-                  <input value={t.name} onChange={(e) => updateTier(t.id, 'name', e.target.value)} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="e.g. Early Bird" type="text" />
+                  <input value={t.name} onChange={(e) => updateTier(t.id, 'name', e.target.value)} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="e.g. Single / Double / VIP Group" type="text" />
                 </div>
                 <div className="md:col-span-3">
+                  <label className="block font-label-md text-label-md text-on-surface-variant mb-base">Admits (People)</label>
+                  <input value={t.admitsCount ?? 1} onChange={(e) => updateTier(t.id, 'admitsCount', e.target.value)} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="1 (Single), 2 (Double)" type="number" min="1" />
+                </div>
+                <div className="md:col-span-2">
                   <label className="block font-label-md text-label-md text-on-surface-variant mb-base">Price (GH₵)</label>
                   <div className="relative">
                     <span className="absolute left-md top-1/2 -translate-y-1/2 text-secondary font-body-md">₵</span>
                     <input value={t.price} onChange={(e) => updateTier(t.id, 'price', e.target.value)} className="w-full h-11 pl-xl pr-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="0.00" type="number" min="0" />
                   </div>
                 </div>
-                <div className="md:col-span-3">
+                <div className="md:col-span-2">
                   <label className="block font-label-md text-label-md text-on-surface-variant mb-base">Quantity</label>
                   <input value={t.quantity} onChange={(e) => updateTier(t.id, 'quantity', e.target.value)} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-body-md" placeholder="100" type="number" min="0" />
                 </div>

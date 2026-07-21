@@ -127,6 +127,7 @@ export default function CreateEventReviewEventnic() {
                   <thead>
                     <tr className="border-b border-outline-variant">
                       <th className="text-left font-label-md text-on-surface-variant py-md px-sm">Tier Name</th>
+                      <th className="text-left font-label-md text-on-surface-variant py-md px-sm">Admits</th>
                       <th className="text-left font-label-md text-on-surface-variant py-md px-sm">Price</th>
                       <th className="text-left font-label-md text-on-surface-variant py-md px-sm">Quantity</th>
                     </tr>
@@ -135,7 +136,8 @@ export default function CreateEventReviewEventnic() {
                     {draft.ticketTiers.map((t) => (
                       <tr key={t.id}>
                         <td className="py-md px-sm font-body-md">{t.name || '—'}</td>
-                        <td className="py-md px-sm font-body-md">${Number(t.price).toFixed(2)}</td>
+                        <td className="py-md px-sm font-body-md">{t.admitsCount || 1} {(t.admitsCount || 1) === 1 ? 'Person' : 'People'}</td>
+                        <td className="py-md px-sm font-body-md">GH₵ {Number(t.price).toFixed(2)}</td>
                         <td className="py-md px-sm font-body-md">{t.quantity}</td>
                       </tr>
                     ))}

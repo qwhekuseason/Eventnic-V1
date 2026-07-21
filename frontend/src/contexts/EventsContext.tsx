@@ -13,6 +13,7 @@ export interface TicketTier {
   price: number;
   quantity: number;
   sold: number;
+  admitsCount?: number;
 }
 
 export interface Speaker {

@@ -126,8 +126,13 @@ export default function PublicEventPage() {
                 <div key={t.id} className={`bg-surface p-xl rounded-xl flex flex-col h-full ${popular ? 'border-2 border-primary shadow-md relative' : 'border border-outline-variant shadow-sm'}`}>
                   {popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-lg py-xs rounded-full font-label-sm text-label-sm">MOST POPULAR</div>}
                   <div className="mb-lg">
-                    <span className={`px-md py-xs rounded-full font-label-sm text-label-sm uppercase tracking-widest ${soldOut ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-100 text-emerald-600 dark:text-emerald-400'}`}>{soldOut ? 'Sold Out' : 'On Sale'}</span>
-                    <h3 className="font-headline-md text-headline-md mt-md">{t.name}</h3>
+                    <div className="flex items-center gap-xs flex-wrap mb-xs">
+                      <span className={`px-md py-xs rounded-full font-label-sm text-label-sm uppercase tracking-widest ${soldOut ? 'bg-surface-container-high text-on-surface-variant' : 'bg-green-100 text-emerald-600 dark:text-emerald-400'}`}>{soldOut ? 'Sold Out' : 'On Sale'}</span>
+                      <span className="px-md py-xs rounded-full font-label-sm text-label-sm bg-primary/10 text-primary font-bold">
+                        Admits {(t.admitsCount || 1)} {(t.admitsCount || 1) === 1 ? 'Person' : 'People'}
+                      </span>
+                    </div>
+                    <h3 className="font-headline-md text-headline-md mt-sm">{t.name}</h3>
                   </div>
                   <div className="mb-xl">
                     <span className="font-display text-[40px] leading-none text-on-surface">GH₵ {Number(t.price).toLocaleString()}</span>
