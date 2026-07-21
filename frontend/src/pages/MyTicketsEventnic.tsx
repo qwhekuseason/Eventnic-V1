@@ -194,43 +194,50 @@ export default function MyTicketsEventnic() {
       {/* QR Code Modal */}
       <AnimatePresence>
         {selectedTicket && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center p-md bg-black/70 backdrop-blur-md"
+            onClick={() => setSelectedTicket(null)}
+          >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-surface p-xl rounded-[24px] shadow-2xl max-w-sm w-full relative"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-surface border border-outline-variant p-6 sm:p-8 rounded-[28px] shadow-2xl w-[92vw] max-w-[420px] relative text-on-surface flex flex-col items-center"
             >
               <button 
                 onClick={() => setSelectedTicket(null)}
-                className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface cursor-pointer"
+                className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors text-on-surface cursor-pointer z-10"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
 
-              <div className="text-center mt-sm mb-xl">
-                <h3 className="font-headline-sm font-bold text-on-surface">{selectedTicket.eventName}</h3>
-                <p className="text-secondary font-body-md mt-xs">{selectedTicket.tierName}</p>
+              <div className="text-center mt-2 mb-6 w-full px-4">
+                <span className="px-md py-xs rounded-full bg-primary/10 text-primary font-label-sm text-xs uppercase tracking-wider font-bold inline-block mb-xs">
+                  Valid Ticket
+                </span>
+                <h3 className="font-headline-md font-bold text-on-surface text-xl leading-tight">{selectedTicket.eventName}</h3>
+                <p className="text-secondary font-body-md text-sm mt-1 font-medium">{selectedTicket.tierName}</p>
               </div>
 
-              <div className="bg-white p-6 rounded-2xl mx-auto w-full max-w-[320px] mb-10 flex items-center justify-center border border-outline-variant shadow-sm">
+              <div className="bg-white p-5 rounded-2xl w-full max-w-[260px] mb-6 flex items-center justify-center border border-slate-200 shadow-inner">
                 <QRCodeSVG 
                   value={selectedTicket.id} 
-                  size={200}
+                  size={190}
                   level="H"
                   includeMargin={true}
                 />
               </div>
 
-              <div className="text-center space-y-3">
-                <p className="font-label-md text-secondary">TICKET ID</p>
-                <p className="font-headline-md font-mono font-bold tracking-wider text-on-surface bg-surface-container py-3 px-4 rounded-xl break-all">
+              <div className="text-center w-full space-y-1 mb-4">
+                <p className="font-label-sm text-xs uppercase tracking-widest text-secondary font-bold">Ticket ID</p>
+                <p className="font-mono font-bold tracking-widest text-primary bg-primary/8 border border-primary/20 py-2.5 px-4 rounded-xl text-lg select-all">
                   {selectedTicket.id.substring(0, 8).toUpperCase()}
                 </p>
               </div>
               
-              <p className="text-center text-body-sm text-secondary mt-xl">
-                Please present this QR code at the entrance for scanning.
+              <p className="text-center text-xs text-secondary leading-relaxed max-w-[280px]">
+                Please present this QR code at the event entrance for ticket verification &amp; scanning.
               </p>
             </motion.div>
           </div>
