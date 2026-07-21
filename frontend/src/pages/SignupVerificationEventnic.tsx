@@ -88,7 +88,6 @@ export default function SignupVerificationEventnic() {
       const updatedUser: User = {
         ...user,
         companyName,
-        registrationNumber,
         phone,
         ghanaCardNumber: formatGhanaCardNumber(ghanaCardNumber),
         verificationDocumentUrl: fileDataUrl,
