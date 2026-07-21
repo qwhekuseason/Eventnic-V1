@@ -10,7 +10,6 @@ export default function SignupVerificationEventnic() {
   const navigate = useNavigate();
   const { user, login } = useAuth();
   const [companyName, setCompanyName] = useState('');
-  const [registrationNumber, setRegistrationNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [ghanaCardNumber, setGhanaCardNumber] = useState('');
   const [verificationFile, setVerificationFile] = useState<File | null>(null);
@@ -79,7 +78,6 @@ export default function SignupVerificationEventnic() {
       const userRef = doc(db, 'users', user.id);
       await updateDoc(userRef, {
         companyName,
-        registrationNumber,
         phone,
         ghanaCardNumber: formatGhanaCardNumber(ghanaCardNumber),
         verificationDocumentUrl: fileDataUrl,
@@ -138,12 +136,7 @@ export default function SignupVerificationEventnic() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="registrationNumber" className="block text-sm font-medium text-on-surface">Registration / ID Number</label>
-                <div className="mt-1">
-                  <input id="registrationNumber" name="registrationNumber" type="text" required value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} className="block w-full rounded-lg border border-outline-variant px-3 py-2 text-on-surface placeholder-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm transition-all" placeholder="RC-123456" />
-                </div>
-              </div>
+
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-on-surface">Phone number</label>
                 <div className="mt-1">
