@@ -42,6 +42,8 @@ const HelpCenterEventnic = lazy(() => import('./pages/HelpCenterEventnic'));
 const HomeEventnic = lazy(() => import('./pages/HomeEventnic'));
 const LoginEventnic = lazy(() => import('./pages/LoginEventnic'));
 const MyTicketsEventnic = lazy(() => import('./pages/MyTicketsEventnic'));
+const PricingEventnic = lazy(() => import('./pages/PricingEventnic'));
+const TicketingEventnic = lazy(() => import('./pages/TicketingEventnic'));
 const OrganizerDashboardEventnic = lazy(() => import('./pages/OrganizerDashboardEventnic'));
 const PaymentSuccessfulEventnic = lazy(() => import('./pages/PaymentSuccessfulEventnic'));
 const PayoutSettingsEventnic = lazy(() => import('./pages/PayoutSettingsEventnic'));
@@ -89,6 +91,8 @@ function Layout() {
             <Route path="/contact" element={<ContactEventnic />} />
             <Route path="/explore" element={<ExploreEventsEventnic />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/pricing" element={<PricingEventnic />} />
+            <Route path="/ticketing" element={<TicketingEventnic />} />
             <Route path="/checkout" element={<CheckoutEventnic />} />
 
             <Route path="/login" element={<LoginEventnic />} />

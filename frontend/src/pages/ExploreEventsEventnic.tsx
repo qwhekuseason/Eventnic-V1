@@ -133,7 +133,7 @@ export default function ExploreEventsEventnic() {
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    <div className="absolute top-4 left-4 glass-panel text-white px-sm py-xs rounded-lg font-bold text-sm backdrop-blur-md">
+                    <div className="absolute top-4 left-4 glass-panel text-on-surface px-sm py-xs rounded-lg font-bold text-sm backdrop-blur-md">
                       {event.date || 'TBA'}
                     </div>
                     <div className="absolute top-4 right-4 bg-surface text-on-surface px-sm py-xs rounded-full font-bold text-sm shadow-md">

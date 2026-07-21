@@ -52,6 +52,7 @@ export interface EventRecord {
   category: string;
   locationType: string;
   location: string;
+  locationCoordinates?: { lat: number; lng: number } | null;
   description: string;
   coverImage: string;
   date: string;
@@ -76,6 +77,7 @@ export interface DraftEvent {
   category: string;
   locationType: string;
   location: string;
+  locationCoordinates?: { lat: number; lng: number } | null;
   description: string;
   coverImage: string;
   date: string;
@@ -102,6 +104,7 @@ export const emptyDraft = (): DraftEvent => ({
   category: '',
   locationType: 'physical',
   location: '',
+  locationCoordinates: null,
   description: '',
   coverImage: '',
   date: '',

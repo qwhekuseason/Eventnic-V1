@@ -15,7 +15,7 @@ export default function ContactEventnic() {
         <div className="max-w-container-max mx-auto px-margin relative z-10 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <h1 className="font-display text-[48px] md:text-[64px] leading-[1.1] text-white tracking-tight mb-md">
-              Get in <span className="text-tertiary">Touch</span>
+              Let's build your <span className="text-tertiary">next event</span> together.
             </h1>
             <p className="font-body-lg text-[18px] text-white/70 max-w-[512px] mx-auto">
               Have a question, feedback, or need help? We'd love to hear from you.
@@ -36,8 +36,8 @@ export default function ContactEventnic() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg">
                   <span className="material-symbols-outlined text-white">mail</span>
                 </div>
-                <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Email Us</h3>
-                <p className="text-secondary font-body-sm mb-md">We typically respond within 24 hours.</p>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Fast Email Support</h3>
+                <p className="text-secondary font-body-sm mb-md">Get straight answers fast. We typically respond within 24 hours.</p>
                 <a href="mailto:support@eventnic.com" className="text-primary font-label-md hover:underline">support@eventnic.com</a>
               </motion.div>
 
@@ -47,8 +47,8 @@ export default function ContactEventnic() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg">
                   <span className="material-symbols-outlined text-white">chat</span>
                 </div>
-                <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Live Chat</h3>
-                <p className="text-secondary font-body-sm mb-md">Available Mon–Fri, 9 AM – 6 PM EST.</p>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Talk to a Real Person</h3>
+                <p className="text-secondary font-body-sm mb-md">Skip the bots. Chat with our team Mon–Fri, 9 AM – 6 PM EST.</p>
                 <button onClick={() => toast('Live chat agent is connecting...', { icon: '💬' })} className="text-primary font-label-md hover:underline">Start a Conversation</button>
               </motion.div>
 
@@ -58,7 +58,7 @@ export default function ContactEventnic() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-premium flex items-center justify-center mb-lg">
                   <span className="material-symbols-outlined text-white">location_on</span>
                 </div>
-                <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Office</h3>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-xs">Drop By the Office</h3>
                 <p className="text-secondary font-body-sm">548 Market St, Suite 92<br/>San Francisco, CA 94104</p>
               </motion.div>
             </div>

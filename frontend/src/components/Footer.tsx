@@ -52,6 +52,9 @@ const Footer = memo(function Footer() {
             <h4 className="font-headline-sm text-headline-sm text-on-surface mb-md">Product</h4>
             <ul className="space-y-sm">
               <li><Link className="text-secondary font-label-md text-label-md hover:text-primary hover:translate-x-1 inline-block transition-transform" to="/explore">Explore Events</Link></li>
+              <li><Link className="text-secondary font-label-md text-label-md hover:text-primary hover:translate-x-1 inline-block transition-transform" to="/ticketing">Ticketing</Link></li>
+              <li><Link className="text-secondary font-label-md text-label-md hover:text-primary hover:translate-x-1 inline-block transition-transform" to="/marketplace">Marketplace</Link></li>
+              <li><Link className="text-secondary font-label-md text-label-md hover:text-primary hover:translate-x-1 inline-block transition-transform" to="/pricing">Pricing</Link></li>
               <li><Link className="text-secondary font-label-md text-label-md hover:text-primary hover:translate-x-1 inline-block transition-transform" to="/about">About Us</Link></li>
               <li><Link className="text-secondary font-label-md text-label-md hover:text-primary hover:translate-x-1 inline-block transition-transform" to="/contact">Contact Sales</Link></li>
             </ul>

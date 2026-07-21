@@ -29,8 +29,8 @@ export default function AboutEventnic() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <p className="text-tertiary font-label-md uppercase tracking-widest mb-md">About Eventnic</p>
             <h1 className="font-display text-[48px] md:text-[64px] leading-[1.1] text-white tracking-tight mb-lg">
-              We believe every event <br className="hidden md:block" />
-              <span className="text-tertiary">deserves to shine.</span>
+              Every event deserves a <br className="hidden md:block" />
+              <span className="text-tertiary">stage worth standing on.</span>
             </h1>
             <p className="font-body-lg text-[18px] text-white/70 max-w-[640px] mx-auto">
               Eventnic was born from a simple idea: organizing events should be effortless, and attending them should be unforgettable.

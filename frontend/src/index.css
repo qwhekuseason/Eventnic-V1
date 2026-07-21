@@ -220,7 +220,12 @@ body {
 
 /* bg version (for bg-clip text in TSX) */
 .bg-gradient-premium {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-tertiary) 100%);
+  background: linear-gradient(135deg, #4834a4 0%, #6d28d9 100%);
+}
+
+/* Dark mode override — slightly brighter but still dark enough for white text */
+html.dark .bg-gradient-premium {
+  background: linear-gradient(135deg, #3730a3 0%, #5b21b6 100%);
 }
 
 /* ============================================================

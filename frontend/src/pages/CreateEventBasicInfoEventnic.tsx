@@ -2,6 +2,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEvents, uid } from '../contexts/EventsContext';
+import LocationInput from '../components/LocationInput';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 function Stepper() {
   const steps = ['Basic Info', 'Tickets', 'Schedule', 'Review'];
@@ -139,7 +141,30 @@ export default function CreateEventBasicInfoEventnic() {
 
             <div className="md:col-span-2 space-y-xs">
               <label className="font-label-md text-label-md text-on-surface">{draft.locationType === 'online' ? 'Event Link / Platform' : 'Venue / Location'}</label>
-              <input value={draft.location} onChange={(e) => set({ location: e.target.value })} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md" placeholder={draft.locationType === 'online' ? 'e.g. Zoom / YouTube Live' : 'e.g. San Francisco Convention Center'} type="text" />
+              {draft.locationType === 'physical' ? (
+                <>
+                  <LocationInput 
+                    value={draft.location} 
+                    onChange={(val) => set({ location: val })} 
+                    onSelectCoordinates={(coords) => set({ locationCoordinates: coords })} 
+                    placeholder="Search for a venue or address..."
+                  />
+                  {draft.locationCoordinates && (
+                    <div className="mt-sm h-[200px] w-full rounded-lg overflow-hidden border border-outline-variant">
+                      <GoogleMap
+                        mapContainerStyle={{ width: '100%', height: '100%' }}
+                        center={draft.locationCoordinates}
+                        zoom={15}
+                        options={{ disableDefaultUI: true, zoomControl: true }}
+                      >
+                        <Marker position={draft.locationCoordinates} />
+                      </GoogleMap>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <input value={draft.location} onChange={(e) => set({ location: e.target.value })} className="w-full h-11 px-md rounded-lg border border-outline-variant focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none transition-all text-body-md" placeholder="e.g. Zoom / YouTube Live" type="text" />
+              )}
             </div>
 
             <div className="space-y-xs">

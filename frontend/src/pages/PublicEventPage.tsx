@@ -1,6 +1,7 @@
 // Removed unused useState, useEffect
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEvents } from '../contexts/EventsContext';
+import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
 
 export default function PublicEventPage() {
   const { slug } = useParams();
@@ -8,6 +9,10 @@ export default function PublicEventPage() {
   const { getEvent } = useEvents();
 
   const event = getEvent(slug || '');
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "",
+  });
 
   if (!event) {
     return (
@@ -177,12 +182,35 @@ export default function PublicEventPage() {
                 </div>
                 <div>
                   <h4 className="font-headline-sm text-headline-sm capitalize">{event.locationType} Event</h4>
-                  <p className="font-body-sm text-body-sm text-secondary">{event.location || 'Details to be announced.'}</p>
+                  <p className="font-body-sm text-body-sm text-secondary mb-sm">{event.location || 'Details to be announced.'}</p>
+                  
+                  {event.locationCoordinates && event.locationType === 'physical' && (
+                    <a 
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${event.locationCoordinates.lat},${event.locationCoordinates.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline inline-flex items-center gap-xs mt-sm"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">directions</span>
+                      Get Directions
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
-            <div className="h-[320px] bg-surface-container-high rounded-2xl overflow-hidden shadow-inner relative flex items-center justify-center">
-              <span className="material-symbols-outlined text-[64px] text-outline">map</span>
+            <div className="h-[320px] bg-surface-container-high rounded-2xl overflow-hidden shadow-inner relative flex items-center justify-center border border-outline-variant">
+              {event.locationCoordinates && event.locationType === 'physical' && isLoaded ? (
+                <GoogleMap
+                  mapContainerStyle={{ width: '100%', height: '100%' }}
+                  center={event.locationCoordinates}
+                  zoom={15}
+                  options={{ disableDefaultUI: true, zoomControl: true }}
+                >
+                  <Marker position={event.locationCoordinates} />
+                </GoogleMap>
+              ) : (
+                <span className="material-symbols-outlined text-[64px] text-outline">map</span>
+              )}
             </div>
           </div>
         </div>

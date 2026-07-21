@@ -59,7 +59,7 @@ export default function RefundPolicyEventnic() {
               <div className="text-secondary font-body-md space-y-md">
                 <p>Eventnic provides tools for organizers to issue refunds seamlessly. When an organizer issues a refund:</p>
                 <ul className="list-disc pl-xl space-y-xs">
-                  <li>Funds are returned to the attendee's original payment method within 5-10 business days.</li>
+                  <li>Funds are returned to the attendee's original payment method within 2-3 business days.</li>
                   <li>The Eventnic ticketing fee is generally non-refundable unless Eventnic cancels the event due to platform violations.</li>
                   <li>Organizers must maintain a sufficient balance in their Eventnic account or connected Stripe account to cover refunds.</li>
                 </ul>

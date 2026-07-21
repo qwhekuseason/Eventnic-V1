@@ -68,7 +68,7 @@ export default function HomeEventnic() {
             </Link>
             
             <h1 className="font-display text-[56px] md:text-[80px] leading-[1.1] text-white tracking-tight mb-md">
-              The Easy Way to manage <br className="hidden md:block"/> 
+              Sell tickets. Run <br className="hidden md:block"/> 
               <motion.span 
                 key={taglineIndex}
                 initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ export default function HomeEventnic() {
               </motion.span>
             </h1>
             <p className="font-body-lg text-[20px] text-white/80 max-w-2xl mx-auto mb-xl">
-              Organizing and managing online events is easy with us. Our platform helps you run everything smoothly in one place.
+              Sell tickets. Run live voting. Get paid — before your event even ends.
             </p>
             
             {/* Search/Action Bar */}
@@ -89,7 +89,7 @@ export default function HomeEventnic() {
               <span className="material-symbols-outlined text-white/70 ml-md mr-sm">search</span>
               <input 
                 type="text" 
-                placeholder="Search upcoming events..." 
+                placeholder="Search live events near you..." 
                 className="flex-grow !bg-transparent border-none outline-none text-white placeholder-white/70 font-body-md"
                 onKeyDown={(e) => {
                   if(e.key === 'Enter') navigate('/explore');
@@ -99,7 +99,7 @@ export default function HomeEventnic() {
                 onClick={() => navigate('/create-event/basic-info')}
                 className="bg-primary hover:bg-tertiary text-white px-xl py-sm rounded-full font-bold font-label-md shadow-lg hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
               >
-                Create Event
+                Create Your Event — Free
               </button>
             </div>
             
@@ -147,52 +147,82 @@ export default function HomeEventnic() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-xl">
-            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all">
-                <span className="material-symbols-outlined text-[28px]">stars</span>
+            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group relative overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <img src="/images/home_nominations_bg.png" alt="Nominations Background" className="w-full h-full object-cover opacity-[0.03] group-hover:opacity-[0.15] transition-opacity duration-500 mix-blend-luminosity" />
               </div>
-              <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Nominations</h3>
-              <p className="text-secondary font-body-md">Collect entries, review submissions, and publish nominees without messy manual follow-up.</p>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[28px]">stars</span>
+                </div>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Nominations</h3>
+                <p className="text-secondary font-body-md">Stop chasing entrants. Collect, review, and publish nominees automatically without the messy manual follow-up.</p>
+              </div>
             </div>
 
-            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                <span className="material-symbols-outlined text-[28px]">how_to_vote</span>
+            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group relative overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <img src="/images/home_voting_bg.png" alt="Live Voting Background" className="w-full h-full object-cover opacity-[0.03] group-hover:opacity-[0.15] transition-opacity duration-500 mix-blend-luminosity" />
               </div>
-              <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Live Voting</h3>
-              <p className="text-secondary font-body-md">Run secure online and USSD voting with live results and a smoother participant experience.</p>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[28px]">how_to_vote</span>
+                </div>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Live Voting</h3>
+                <p className="text-secondary font-body-md">Turn your audience into active participants. Run secure online and USSD voting with live results they can trust.</p>
+              </div>
             </div>
 
-            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                <span className="material-symbols-outlined text-[28px]">local_activity</span>
+            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group relative overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <img src="/images/home_ticketing_bg.png" alt="Ticketing Background" className="w-full h-full object-cover opacity-[0.03] group-hover:opacity-[0.15] transition-opacity duration-500 mix-blend-luminosity" />
               </div>
-              <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Ticketing</h3>
-              <p className="text-secondary font-body-md">Sell tickets, manage ticket types, and keep registrations moving from launch to check-in.</p>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[28px]">local_activity</span>
+                </div>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Ticketing</h3>
+                <p className="text-secondary font-body-md">Sell out faster with zero friction. Manage ticket types and keep registrations moving from launch to check-in.</p>
+              </div>
             </div>
 
-            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group">
-              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                <span className="material-symbols-outlined text-[28px]">rsvp</span>
+            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group relative overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <img src="/images/home_rsvp_bg.png" alt="Guest RSVP Background" className="w-full h-full object-cover opacity-[0.03] group-hover:opacity-[0.15] transition-opacity duration-500 mix-blend-luminosity" />
               </div>
-              <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Guest RSVP</h3>
-              <p className="text-secondary font-body-md">Track confirmations, manage guest lists, and send reminders without chasing attendees manually.</p>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[28px]">rsvp</span>
+                </div>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Guest RSVP</h3>
+                <p className="text-secondary font-body-md">Know exactly who's coming. Track confirmations and send automated reminders so you never have to chase attendees again.</p>
+              </div>
             </div>
 
-            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group">
-              <div className="w-14 h-14 rounded-2xl bg-fuchsia-500/10 text-fuchsia-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-fuchsia-500 group-hover:text-white transition-all">
-                <span className="material-symbols-outlined text-[28px]">storefront</span>
+            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group relative overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <img src="/images/home_marketplace_bg.png" alt="Marketplace Background" className="w-full h-full object-cover opacity-[0.03] group-hover:opacity-[0.15] transition-opacity duration-500 mix-blend-luminosity" />
               </div>
-              <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Marketplace</h3>
-              <p className="text-secondary font-body-md">Find venues, vendors, and event services in one place to speed up event planning decisions.</p>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-fuchsia-500/10 text-fuchsia-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-fuchsia-500 group-hover:text-white transition-all backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[28px]">storefront</span>
+                </div>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Marketplace</h3>
+                <p className="text-secondary font-body-md">Find the perfect partners instantly. Connect with top venues and vendors to speed up your event planning decisions.</p>
+              </div>
             </div>
 
-            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group">
-              <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all">
-                <span className="material-symbols-outlined text-[28px]">monitoring</span>
+            <div className="p-xl rounded-[24px] bg-surface border border-outline-variant card-hover group relative overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <img src="/images/home_analytics_bg.png" alt="Analytics Background" className="w-full h-full object-cover opacity-[0.03] group-hover:opacity-[0.15] transition-opacity duration-500 mix-blend-luminosity" />
               </div>
-              <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Deep Analytics</h3>
-              <p className="text-secondary font-body-md">Track page views, conversion rates, and revenue in real-time. Export CSV reports for your accounting team.</p>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center mb-lg group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all backdrop-blur-md">
+                  <span className="material-symbols-outlined text-[28px]">monitoring</span>
+                </div>
+                <h3 className="font-headline-sm font-bold text-on-surface mb-sm">Deep Analytics</h3>
+                <p className="text-secondary font-body-md">See what's actually working. Track page views, conversion rates, and revenue in real-time to maximize your ROI.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -292,16 +322,17 @@ export default function HomeEventnic() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-tertiary to-primary"></div>
           
           <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="font-display text-[48px] text-white mb-lg leading-tight">Host your next big idea with Eventnic.</h2>
+            <p className="text-tertiary font-label-md uppercase tracking-widest mb-md">Fast. Secure. Seamless.</p>
+            <h2 className="font-display text-[48px] text-white mb-lg leading-tight">Ready to pack the house?</h2>
             <p className="text-white/80 font-body-lg mb-xl">
-              Join thousands of organizers who have upgraded their event management experience. From ticket sales to final payout, we handle the heavy lifting.
+              Don't leave your event's success to chance. Upgrade to the platform built to help you sell out, stand out, and get paid faster.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-md">
               <button onClick={() => navigate('/create-event/basic-info')} className="bg-surface text-primary font-bold font-headline-sm px-[40px] py-[16px] rounded-full shadow-xl hover:scale-105 active:scale-95 transition-all w-full sm:w-auto glow-primary">
-                Get Started Free
+                Start Free
               </button>
               <button onClick={() => navigate('/contact')} className="bg-transparent text-white font-bold font-headline-sm px-[40px] py-[16px] rounded-full hover:bg-white/10 transition-all w-full sm:w-auto border border-white/30">
-                Talk to Sales
+                Talk to Our Team
               </button>
             </div>
           </div>

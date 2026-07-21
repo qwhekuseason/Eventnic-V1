@@ -57,6 +57,9 @@ const Header = memo(function Header() {
 
   const navLinks = [
     { name: 'Explore', path: '/explore' },
+    { name: 'Ticketing', path: '/ticketing' },
+    { name: 'Marketplace', path: '/marketplace' },
+    { name: 'Pricing', path: '/pricing' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];

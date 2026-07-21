@@ -156,8 +156,8 @@ export default function EventnicEventManagementPlatform() {
 
 <div className="absolute inset-0 opacity-10 pointer-events-none" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px'}}></div>
 <div className="relative z-10">
-<h2 className="font-display text-white mb-lg">Ready to launch your event?</h2>
-<p className="text-on-primary-container font-body-lg mb-xl max-w-2xl mx-auto opacity-80">
+<h2 className="font-display text-inverse-on-surface mb-lg">Ready to launch your event?</h2>
+<p className="text-inverse-on-surface font-body-lg mb-xl max-w-2xl mx-auto opacity-80">
                         Join over 10,000+ event organizers worldwide. From local workshops to global summits, Eventnic scales with you.
                     </p>
 <button onClick={() => navigate('/create-event/basic-info')} className="bg-surface text-primary font-headline-sm px-[48px] py-[20px] rounded-xl shadow-xl hover:scale-105 active:scale-95 transition-all">Create Event Now</button>

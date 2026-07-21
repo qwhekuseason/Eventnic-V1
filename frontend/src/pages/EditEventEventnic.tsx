@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useEvents } from '../contexts/EventsContext';
 import { useAuth } from '../contexts/AuthContext';
+import LocationInput from '../components/LocationInput';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 
 export default function EditEventEventnic() {
   const { slug } = useParams<{ slug: string }>();
@@ -16,6 +18,7 @@ export default function EditEventEventnic() {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [location, setLocation] = useState('');
+  const [locationCoordinates, setLocationCoordinates] = useState<{ lat: number, lng: number } | null>(null);
   const [locationType, setLocationType] = useState('physical');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -26,6 +29,7 @@ export default function EditEventEventnic() {
       setDate(event.date || '');
       setTime(event.time || '');
       setLocation(event.location || '');
+      setLocationCoordinates(event.locationCoordinates || null);
       setLocationType(event.locationType || 'physical');
     }
   }, [event]);
@@ -49,6 +53,7 @@ export default function EditEventEventnic() {
         date,
         time,
         location,
+        locationCoordinates,
         locationType
       });
       alert('Event updated successfully!');
@@ -137,14 +142,37 @@ export default function EditEventEventnic() {
                 <label className="block font-label-md text-on-surface mb-xs">
                   {locationType === 'online' ? 'Meeting Link' : 'Venue Address'}
                 </label>
-                <input 
-                  type="text" 
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  required={locationType !== 'tba'}
-                  placeholder={locationType === 'online' ? 'https://zoom.us/...' : '123 Main St...'}
-                  className="w-full bg-background border border-outline-variant rounded-xl px-md py-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                />
+                {locationType === 'physical' ? (
+                  <>
+                    <LocationInput 
+                      value={location}
+                      onChange={setLocation}
+                      onSelectCoordinates={setLocationCoordinates}
+                      placeholder="Search for a venue or address..."
+                    />
+                    {locationCoordinates && (
+                      <div className="mt-sm h-[200px] w-full rounded-lg overflow-hidden border border-outline-variant">
+                        <GoogleMap
+                          mapContainerStyle={{ width: '100%', height: '100%' }}
+                          center={locationCoordinates}
+                          zoom={15}
+                          options={{ disableDefaultUI: true, zoomControl: true }}
+                        >
+                          <Marker position={locationCoordinates} />
+                        </GoogleMap>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <input 
+                    type="text" 
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    required={locationType !== 'tba'}
+                    placeholder={locationType === 'online' ? 'https://zoom.us/...' : '123 Main St...'}
+                    className="w-full bg-background border border-outline-variant rounded-xl px-md py-md text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                  />
+                )}
               </div>
             )}
           </div>

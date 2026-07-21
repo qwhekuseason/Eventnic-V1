@@ -7,6 +7,10 @@ export const createEventSchema = z.object({
       category: z.string(),
       locationType: z.string(),
       location: z.string(),
+      locationCoordinates: z.object({
+        lat: z.number(),
+        lng: z.number(),
+      }).nullable().optional(),
       description: z.string(),
       date: z.string(),
       time: z.string(),
