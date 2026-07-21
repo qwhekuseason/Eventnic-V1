@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEvents, eventCapacity } from '../../contexts/EventsContext';
+import type { EventRecord } from '../../contexts/EventsContext';
+import EventDetailsModal from '../../components/EventDetailsModal';
 
 type Filter = 'all' | 'pending' | 'published' | 'rejected';
 
 export default function AdminEventModeration() {
   const [filter, setFilter] = useState<Filter>('all');
+  const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
   const { events, approveEvent, rejectEvent, updateEvent } = useEvents();
 
   const visible = events.filter((e) => e.status !== 'draft');
@@ -30,7 +33,7 @@ export default function AdminEventModeration() {
               </Link>
               <h1 className="font-display text-[36px] text-on-surface leading-tight">Event Moderation</h1>
             </div>
-            <p className="text-secondary font-body-lg">Review, approve, or reject event submissions.</p>
+            <p className="text-secondary font-body-lg">Review, approve, or inspect all details of event submissions.</p>
           </div>
         </div>
 
@@ -76,10 +79,14 @@ export default function AdminEventModeration() {
         <div className="space-y-md">
           {filtered.length === 0 && <div className="bg-surface rounded-2xl border border-outline-variant p-xl text-center text-secondary">No events in this view.</div>}
           {filtered.map((event) => (
-            <div key={event.id} className="bg-surface rounded-2xl border border-outline-variant shadow-sm p-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:shadow-md transition-shadow">
+            <div
+              key={event.id}
+              onClick={() => setSelectedEvent(event)}
+              className="bg-surface rounded-2xl border border-outline-variant shadow-sm p-lg flex flex-col md:flex-row md:items-center justify-between gap-md hover:shadow-md hover:border-primary transition-all cursor-pointer group"
+            >
               <div className="flex-1">
                 <div className="flex items-center gap-sm mb-xs">
-                  <h3 className="font-bold text-on-surface text-lg">{event.title}</h3>
+                  <h3 className="font-bold text-on-surface text-lg group-hover:text-primary transition-colors">{event.title}</h3>
                   <span className={`px-sm py-xs rounded-full font-label-sm text-xs font-bold capitalize ${event.status === 'pending' ? 'bg-amber-100 text-amber-600 dark:text-amber-400 border border-amber-500/30' : event.status === 'published' ? 'bg-green-100 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-red-100 text-on-error-container border border-error/30'}`}>
                     {statusLabel(event.status)}
                   </span>
@@ -91,7 +98,13 @@ export default function AdminEventModeration() {
                   <span className="flex items-center gap-xs"><span className="material-symbols-outlined text-[16px]">confirmation_number</span> {eventCapacity(event).toLocaleString()} tickets</span>
                 </div>
               </div>
-              <div className="flex gap-sm">
+              <div className="flex gap-sm items-center" onClick={(e) => e.stopPropagation()}>
+                <button
+                  onClick={() => setSelectedEvent(event)}
+                  className="px-md py-sm rounded-xl bg-surface-container-high text-on-surface font-bold font-label-md hover:bg-primary hover:text-white transition-all flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[18px]">visibility</span> View Details
+                </button>
                 {event.status === 'pending' ? (
                   <>
                     <button onClick={() => rejectEvent(event.id)} className="px-md py-sm rounded-xl border border-red-300 text-error font-bold font-label-md hover:bg-error-container transition-colors">Reject</button>
@@ -104,6 +117,15 @@ export default function AdminEventModeration() {
             </div>
           ))}
         </div>
+
+        {/* Modal for viewing all event details */}
+        <EventDetailsModal
+          event={selectedEvent}
+          isOpen={!!selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          onApprove={approveEvent}
+          onReject={rejectEvent}
+        />
       </div>
     </div>
   );

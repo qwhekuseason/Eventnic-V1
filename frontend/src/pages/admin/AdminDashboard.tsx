@@ -1,13 +1,16 @@
-// @ts-nocheck
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useEvents, eventRevenue } from '../../contexts/EventsContext';
+import type { EventRecord } from '../../contexts/EventsContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import EventDetailsModal from '../../components/EventDetailsModal';
 
 const money = (n: number) => 'GH₵ ' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
   const { events, platformTotals, getPendingEvents, approveEvent, rejectEvent } = useEvents();
 
   const totals = platformTotals();
@@ -154,13 +157,17 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="divide-y divide-outline-variant">
                     {pending.map((e) => (
-                      <div key={e.id} className="p-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md hover:bg-surface-container-lowest transition-colors">
+                      <div
+                        key={e.id}
+                        onClick={() => setSelectedEvent(e)}
+                        className="p-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md hover:bg-surface-container-lowest transition-colors cursor-pointer group"
+                      >
                         <div className="flex items-center gap-md">
                           <div className="w-16 h-16 rounded-xl overflow-hidden bg-surface-variant flex items-center justify-center shrink-0 shadow-sm">
-                            {e.coverImage ? <img src={e.coverImage} alt={e.title} className="w-full h-full object-cover" /> : <span className="material-symbols-outlined text-secondary">image</span>}
+                            {e.coverImage ? <img src={e.coverImage} alt={e.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /> : <span className="material-symbols-outlined text-secondary">image</span>}
                           </div>
                           <div>
-                            <h4 className="font-bold text-on-surface font-headline-sm">{e.title}</h4>
+                            <h4 className="font-bold text-on-surface font-headline-sm group-hover:text-primary transition-colors">{e.title}</h4>
                             <div className="flex items-center gap-xs mt-xs text-secondary font-body-sm">
                               <span className="material-symbols-outlined text-[16px]">person</span> {e.organizerName}
                               <span className="mx-xs">•</span>
@@ -168,7 +175,13 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-sm items-center w-full sm:w-auto justify-end mt-sm sm:mt-0 border-t sm:border-t-0 border-outline-variant pt-sm sm:pt-0">
+                        <div className="flex gap-sm items-center w-full sm:w-auto justify-end mt-sm sm:mt-0 border-t sm:border-t-0 border-outline-variant pt-sm sm:pt-0" onClick={(ev) => ev.stopPropagation()}>
+                          <button
+                            onClick={() => setSelectedEvent(e)}
+                            className="bg-surface-container-high text-on-surface hover:bg-primary hover:text-white px-md py-sm rounded-xl font-bold font-label-md transition-all flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">visibility</span> View Details
+                          </button>
                           <button onClick={() => rejectEvent(e.id)} className="text-error font-bold font-label-md px-md py-sm rounded-lg hover:bg-error/10 transition-colors">Reject</button>
                           <button onClick={() => approveEvent(e.id)} className="bg-primary text-white px-lg py-sm rounded-xl font-bold font-label-md hover:bg-primary-container shadow-md transition-all active:scale-95">Approve Live</button>
                         </div>
@@ -210,6 +223,10 @@ export default function AdminDashboard() {
                       <span className="font-label-sm">Manage Users</span>
                       <span className="material-symbols-outlined text-[16px]">chevron_right</span>
                     </Link>
+                    <Link to="/admin/moderation" className="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg text-secondary hover:text-primary transition-colors">
+                      <span className="font-label-sm">Event Moderation Queue</span>
+                      <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                    </Link>
                     <Link to="/explore" className="flex items-center justify-between p-sm hover:bg-surface-container-low rounded-lg text-secondary hover:text-primary transition-colors">
                       <span className="font-label-sm">View Live Portal</span>
                       <span className="material-symbols-outlined text-[16px]">chevron_right</span>
@@ -221,6 +238,14 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      <EventDetailsModal
+        event={selectedEvent}
+        isOpen={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+        onApprove={approveEvent}
+        onReject={rejectEvent}
+      />
     </div>
   );
 }

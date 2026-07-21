@@ -9,6 +9,7 @@ export default function CreateEventReviewEventnic() {
   const { user } = useAuth();
   const { draft, createEvent, resetDraft } = useEvents();
   const [agreed, setAgreed] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const handleBack = () => navigate('/create-event/schedule');
 
@@ -27,6 +28,7 @@ export default function CreateEventReviewEventnic() {
     }
 
     try {
+      setIsPublishing(true);
       await createEvent(draft, 'pending', user?.email || 'unknown', user?.name || 'Organizer', user?.votePrice || 0);
       resetDraft();
       alert('Event submitted! It will go live once an admin approves it.');
@@ -34,6 +36,8 @@ export default function CreateEventReviewEventnic() {
     } catch (error) {
       console.error('Failed to submit event:', error);
       alert('Unable to submit event. Please try again or check your network.');
+    } finally {
+      setIsPublishing(false);
     }
   };
 

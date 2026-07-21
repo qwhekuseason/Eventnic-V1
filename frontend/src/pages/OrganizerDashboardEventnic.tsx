@@ -1,9 +1,11 @@
 // @ts-nocheck
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useEvents, eventSold, eventCapacity, eventSoldPct } from '../contexts/EventsContext';
 import { useNominations } from '../contexts/NominationsContext';
 import { motion } from 'framer-motion';
+import EventDetailsModal from '../components/EventDetailsModal';
 
 const money = (n: number) => 'GH₵ ' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -19,6 +21,7 @@ function StatusBadge({ event }) {
 export default function OrganizerDashboardEventnic() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const { getEventsByOrganizer, organizerTotals } = useEvents();
 
   const { nominations } = useNominations();
@@ -166,7 +169,7 @@ export default function OrganizerDashboardEventnic() {
                     const cap = eventCapacity(e);
                     const pct = eventSoldPct(e);
                     return (
-                      <tr key={e.id} onClick={() => navigate(`/event-analytics?event=${e.id}`)} className="hover:bg-surface-container-lowest cursor-pointer transition-colors group">
+                      <tr key={e.id} onClick={() => setSelectedEvent(e)} className="hover:bg-surface-container-lowest cursor-pointer transition-colors group">
                         <td className="px-xl py-lg">
                           <div className="flex items-center gap-md">
                             <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-surface-variant flex items-center justify-center shadow-sm">
@@ -204,10 +207,15 @@ export default function OrganizerDashboardEventnic() {
                           })()}
                         </td>
                         <td className="px-xl py-lg"><StatusBadge event={e} /></td>
-                        <td className="px-xl py-lg text-right">
-                          <button onClick={(ev) => { ev.stopPropagation(); navigate(`/event-analytics?event=${e.id}`); }} className="bg-primary/10 text-primary hover:bg-primary hover:text-white px-md py-xs rounded-full font-label-sm font-bold transition-all flex items-center gap-xs">
-                            <span className="material-symbols-outlined text-[16px]">settings</span> Manage
-                          </button>
+                        <td className="px-xl py-lg text-right" onClick={(ev) => ev.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-xs">
+                            <button onClick={() => setSelectedEvent(e)} className="bg-surface-container-high text-on-surface hover:bg-surface-container border border-outline-variant px-md py-xs rounded-full font-label-sm font-bold transition-all flex items-center gap-xs">
+                              <span className="material-symbols-outlined text-[16px]">visibility</span> View Details
+                            </button>
+                            <button onClick={() => navigate(`/event-analytics?event=${e.id}`)} className="bg-primary/10 text-primary hover:bg-primary hover:text-white px-md py-xs rounded-full font-label-sm font-bold transition-all flex items-center gap-xs">
+                              <span className="material-symbols-outlined text-[16px]">analytics</span> Analytics
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -218,6 +226,12 @@ export default function OrganizerDashboardEventnic() {
           )}
         </motion.section>
       </div>
+
+      <EventDetailsModal
+        event={selectedEvent}
+        isOpen={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
     </main>
   );
 }
